@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Typography, Spin, message, Card, Button, Select, Row, Col } from 'antd';
+import {
+  Table,
+  Typography,
+  Spin,
+  message,
+  Card,
+  Button,
+  Select,
+  Row,
+  Col,
+  Pagination,
+} from 'antd';
 import axios from 'axios';
 
 const { Title } = Typography;
@@ -40,6 +51,8 @@ const SORT_ORDERS = [
   { value: 'desc', label: 'Giảm dần' },
 ];
 
+const PAGE_SIZE = 5;
+
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
@@ -48,17 +61,25 @@ function App() {
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [sortField, setSortField] = useState<string>('title');
   const [sortOrder, setSortOrder] = useState<string>('desc');
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
 
   // Fetch task list
-  const fetchTasks = (status: string = '', sort_key: string = 'title', sort_value: string = 'desc') => {
+  const fetchTasks = (
+    status = '',
+    sort_key = 'title',
+    sort_value = 'desc',
+    pageNum = 1
+  ) => {
     setLoading(true);
     let url = API_BASE;
-    const params: string[] = [];
+    const params = [];
     if (status) params.push(`status=${status}`);
     if (sort_key && sort_value) {
       params.push(`sort_key=${sort_key}`);
       params.push(`sort_value=${sort_value}`);
     }
+    params.push(`page=${pageNum}`);
     if (params.length > 0) {
       url += '?' + params.join('&');
     }
@@ -66,6 +87,8 @@ function App() {
       .get(url)
       .then((res) => {
         setTasks(res.data.data);
+        setTotalPage(Number(res.data.pagination.totalPage));
+        // KHÔNG setPage từ backend nữa!
       })
       .catch(() => {
         message.error('Lỗi tải danh sách task');
@@ -73,10 +96,17 @@ function App() {
       .finally(() => setLoading(false));
   };
 
+  // Khi filter, sort thay đổi thì về trang 1 (KHÔNG fetchTasks ở đây)
   useEffect(() => {
-    fetchTasks(statusFilter, sortField, sortOrder);
+    setPage(1);
     // eslint-disable-next-line
   }, [statusFilter, sortField, sortOrder]);
+
+  // Khi page hoặc filter, sort thay đổi thì gọi fetchTasks
+  useEffect(() => {
+    fetchTasks(statusFilter, sortField, sortOrder, page);
+    // eslint-disable-next-line
+  }, [page, statusFilter, sortField, sortOrder]);
 
   // Fetch task detail
   const fetchDetail = (id: string) => {
@@ -110,7 +140,11 @@ function App() {
           pending: 'warning',
           notFinish: 'error',
         };
-        return <span style={{ color: colorMap[status] ? undefined : '#888' }}>{status}</span>;
+        return (
+          <span style={{ color: colorMap[status] ? undefined : '#888' }}>
+            {status}
+          </span>
+        );
       },
     },
     {
@@ -138,8 +172,10 @@ function App() {
               value={statusFilter}
               onChange={setStatusFilter}
             >
-              {STATUS_OPTIONS.map(opt => (
-                <Option key={opt.value} value={opt.value}>{opt.label}</Option>
+              {STATUS_OPTIONS.map((opt) => (
+                <Option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </Option>
               ))}
             </Select>
           </Col>
@@ -150,8 +186,10 @@ function App() {
               value={sortField}
               onChange={setSortField}
             >
-              {SORT_FIELDS.map(opt => (
-                <Option key={opt.value} value={opt.value}>{opt.label}</Option>
+              {SORT_FIELDS.map((opt) => (
+                <Option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </Option>
               ))}
             </Select>
             <Select
@@ -159,8 +197,10 @@ function App() {
               value={sortOrder}
               onChange={setSortOrder}
             >
-              {SORT_ORDERS.map(opt => (
-                <Option key={opt.value} value={opt.value}>{opt.label}</Option>
+              {SORT_ORDERS.map((opt) => (
+                <Option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </Option>
               ))}
             </Select>
           </Col>
@@ -170,8 +210,27 @@ function App() {
             dataSource={tasks}
             columns={columns}
             rowKey="_id"
-            pagination={{ pageSize: 8 }}
+            pagination={false}
           />
+          {/* Hiển thị phân trang đẹp với Ant Design Pagination */}
+          {totalPage > 1 && (
+            <div
+              style={{
+                marginTop: 16,
+                display: 'flex',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <Pagination
+                current={page}
+                total={totalPage * PAGE_SIZE}
+                pageSize={PAGE_SIZE}
+                onChange={setPage}
+                showSizeChanger={false}
+                className="custom-pagination"
+              />
+            </div>
+          )}
         </Spin>
       </Card>
       {selectedTask && (
@@ -185,12 +244,36 @@ function App() {
           style={{ marginBottom: 32 }}
         >
           <Spin spinning={detailLoading} tip="Đang tải chi tiết...">
-            <p><b>Trạng thái:</b> {selectedTask.status}</p>
-            <p><b>Nội dung:</b> {selectedTask.content}</p>
-            <p><b>Bắt đầu:</b> {selectedTask.timeStart ? new Date(selectedTask.timeStart).toLocaleString() : '-'}</p>
-            <p><b>Kết thúc:</b> {selectedTask.timeFinish ? new Date(selectedTask.timeFinish).toLocaleString() : '-'}</p>
-            <p><b>Ngày tạo:</b> {selectedTask.createdAt ? new Date(selectedTask.createdAt).toLocaleString() : '-'}</p>
-            <p><b>Ngày cập nhật:</b> {selectedTask.updatedAt ? new Date(selectedTask.updatedAt).toLocaleString() : '-'}</p>
+            <p>
+              <b>Trạng thái:</b> {selectedTask.status}
+            </p>
+            <p>
+              <b>Nội dung:</b> {selectedTask.content}
+            </p>
+            <p>
+              <b>Bắt đầu:</b>{' '}
+              {selectedTask.timeStart
+                ? new Date(selectedTask.timeStart).toLocaleString()
+                : '-'}
+            </p>
+            <p>
+              <b>Kết thúc:</b>{' '}
+              {selectedTask.timeFinish
+                ? new Date(selectedTask.timeFinish).toLocaleString()
+                : '-'}
+            </p>
+            <p>
+              <b>Ngày tạo:</b>{' '}
+              {selectedTask.createdAt
+                ? new Date(selectedTask.createdAt).toLocaleString()
+                : '-'}
+            </p>
+            <p>
+              <b>Ngày cập nhật:</b>{' '}
+              {selectedTask.updatedAt
+                ? new Date(selectedTask.updatedAt).toLocaleString()
+                : '-'}
+            </p>
           </Spin>
         </Card>
       )}
