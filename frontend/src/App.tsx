@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Typography, Spin, message, Card, Button } from 'antd';
+import { Table, Typography, Spin, message, Card, Button, Select, Row, Col } from 'antd';
 import axios from 'axios';
 
 const { Title } = Typography;
+const { Option } = Select;
 
 interface Task {
   _id: string;
@@ -17,17 +18,52 @@ interface Task {
 
 const API_BASE = '/api/v1/tasks';
 
+const STATUS_OPTIONS = [
+  { value: '', label: 'Tất cả' },
+  { value: 'initial', label: 'Initial' },
+  { value: 'doing', label: 'Doing' },
+  { value: 'finish', label: 'Finish' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'notFinish', label: 'Not Finish' },
+];
+
+const SORT_FIELDS = [
+  { value: 'title', label: 'Tiêu đề' },
+  { value: 'status', label: 'Trạng thái' },
+  { value: 'createdAt', label: 'Ngày tạo' },
+  { value: 'updatedAt', label: 'Ngày cập nhật' },
+  { value: 'timeStart', label: 'Thời gian bắt đầu' },
+  { value: 'timeFinish', label: 'Thời gian kết thúc' },
+];
+const SORT_ORDERS = [
+  { value: 'asc', label: 'Tăng dần' },
+  { value: 'desc', label: 'Giảm dần' },
+];
+
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [sortField, setSortField] = useState<string>('title');
+  const [sortOrder, setSortOrder] = useState<string>('desc');
 
   // Fetch task list
-  useEffect(() => {
+  const fetchTasks = (status: string = '', sort_key: string = 'title', sort_value: string = 'desc') => {
     setLoading(true);
+    let url = API_BASE;
+    const params: string[] = [];
+    if (status) params.push(`status=${status}`);
+    if (sort_key && sort_value) {
+      params.push(`sort_key=${sort_key}`);
+      params.push(`sort_value=${sort_value}`);
+    }
+    if (params.length > 0) {
+      url += '?' + params.join('&');
+    }
     axios
-      .get(`${API_BASE}`)
+      .get(url)
       .then((res) => {
         setTasks(res.data.data);
       })
@@ -35,7 +71,12 @@ function App() {
         message.error('Lỗi tải danh sách task');
       })
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => {
+    fetchTasks(statusFilter, sortField, sortOrder);
+    // eslint-disable-next-line
+  }, [statusFilter, sortField, sortOrder]);
 
   // Fetch task detail
   const fetchDetail = (id: string) => {
@@ -69,11 +110,7 @@ function App() {
           pending: 'warning',
           notFinish: 'error',
         };
-        return (
-          <span style={{ color: colorMap[status] ? undefined : '#888' }}>
-            {status}
-          </span>
-        );
+        return <span style={{ color: colorMap[status] ? undefined : '#888' }}>{status}</span>;
       },
     },
     {
@@ -93,6 +130,41 @@ function App() {
         Task Management
       </Title>
       <Card title="Danh sách Task" style={{ marginBottom: 32 }}>
+        <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+          <Col span={12}>
+            <b>Lọc theo trạng thái:</b>
+            <Select
+              style={{ width: 180, marginLeft: 12 }}
+              value={statusFilter}
+              onChange={setStatusFilter}
+            >
+              {STATUS_OPTIONS.map(opt => (
+                <Option key={opt.value} value={opt.value}>{opt.label}</Option>
+              ))}
+            </Select>
+          </Col>
+          <Col span={12} style={{ textAlign: 'right' }}>
+            <b>Sắp xếp:</b>
+            <Select
+              style={{ width: 180, marginLeft: 12 }}
+              value={sortField}
+              onChange={setSortField}
+            >
+              {SORT_FIELDS.map(opt => (
+                <Option key={opt.value} value={opt.value}>{opt.label}</Option>
+              ))}
+            </Select>
+            <Select
+              style={{ width: 120, marginLeft: 8 }}
+              value={sortOrder}
+              onChange={setSortOrder}
+            >
+              {SORT_ORDERS.map(opt => (
+                <Option key={opt.value} value={opt.value}>{opt.label}</Option>
+              ))}
+            </Select>
+          </Col>
+        </Row>
         <Spin spinning={loading} tip="Đang tải...">
           <Table
             dataSource={tasks}
@@ -113,36 +185,12 @@ function App() {
           style={{ marginBottom: 32 }}
         >
           <Spin spinning={detailLoading} tip="Đang tải chi tiết...">
-            <p>
-              <b>Trạng thái:</b> {selectedTask.status}
-            </p>
-            <p>
-              <b>Nội dung:</b> {selectedTask.content}
-            </p>
-            <p>
-              <b>Bắt đầu:</b>{' '}
-              {selectedTask.timeStart
-                ? new Date(selectedTask.timeStart).toLocaleString()
-                : '-'}
-            </p>
-            <p>
-              <b>Kết thúc:</b>{' '}
-              {selectedTask.timeFinish
-                ? new Date(selectedTask.timeFinish).toLocaleString()
-                : '-'}
-            </p>
-            <p>
-              <b>Ngày tạo:</b>{' '}
-              {selectedTask.createdAt
-                ? new Date(selectedTask.createdAt).toLocaleString()
-                : '-'}
-            </p>
-            <p>
-              <b>Ngày cập nhật:</b>{' '}
-              {selectedTask.updatedAt
-                ? new Date(selectedTask.updatedAt).toLocaleString()
-                : '-'}
-            </p>
+            <p><b>Trạng thái:</b> {selectedTask.status}</p>
+            <p><b>Nội dung:</b> {selectedTask.content}</p>
+            <p><b>Bắt đầu:</b> {selectedTask.timeStart ? new Date(selectedTask.timeStart).toLocaleString() : '-'}</p>
+            <p><b>Kết thúc:</b> {selectedTask.timeFinish ? new Date(selectedTask.timeFinish).toLocaleString() : '-'}</p>
+            <p><b>Ngày tạo:</b> {selectedTask.createdAt ? new Date(selectedTask.createdAt).toLocaleString() : '-'}</p>
+            <p><b>Ngày cập nhật:</b> {selectedTask.updatedAt ? new Date(selectedTask.updatedAt).toLocaleString() : '-'}</p>
           </Spin>
         </Card>
       )}

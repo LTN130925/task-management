@@ -5,9 +5,22 @@ import Task from '../models/tasks.model';
 export const controller = {
   // [GET] /api/v1/tasks
   index: async (req: Request, res: Response) => {
-    const tasks = await Task.find({
+    const filter: any = {
       deleted: false,
-    });
+    };
+    // Filter by status
+    if (req.query.status) {
+      filter.status = req.query.status;
+    }
+    // Sort by ...
+    const sort: any = {
+      title: 'desc',
+    };
+    if (req.query.sort_key && req.query.sort_value) {
+      sort[req.query.sort_key as string] = req.query.sort_value as string;
+    }
+
+    const tasks = await Task.find(filter).sort(sort);
 
     res.status(200).json({
       success: true,
