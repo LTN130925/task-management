@@ -51,7 +51,7 @@ const SORT_ORDERS = [
   { value: 'desc', label: 'Giảm dần' },
 ];
 
-const PAGE_SIZE = 5;
+const LIMIT_OPTIONS = [2, 5, 10, 20, 50];
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -63,13 +63,15 @@ function App() {
   const [sortOrder, setSortOrder] = useState<string>('desc');
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
+  const [limit, setLimit] = useState<number>(5);
 
   // Fetch task list
   const fetchTasks = (
     status = '',
     sort_key = 'title',
     sort_value = 'desc',
-    pageNum = 1
+    pageNum = 1,
+    limitNum = 5
   ) => {
     setLoading(true);
     let url = API_BASE;
@@ -80,6 +82,7 @@ function App() {
       params.push(`sort_value=${sort_value}`);
     }
     params.push(`page=${pageNum}`);
+    params.push(`limit=${limitNum}`);
     if (params.length > 0) {
       url += '?' + params.join('&');
     }
@@ -104,9 +107,9 @@ function App() {
 
   // Khi page hoặc filter, sort thay đổi thì gọi fetchTasks
   useEffect(() => {
-    fetchTasks(statusFilter, sortField, sortOrder, page);
+    fetchTasks(statusFilter, sortField, sortOrder, page, limit);
     // eslint-disable-next-line
-  }, [page, statusFilter, sortField, sortOrder]);
+  }, [page, statusFilter, sortField, sortOrder, limit]);
 
   // Fetch task detail
   const fetchDetail = (id: string) => {
@@ -213,24 +216,44 @@ function App() {
             pagination={false}
           />
           {/* Hiển thị phân trang đẹp với Ant Design Pagination */}
-          {totalPage > 1 && (
-            <div
-              style={{
-                marginTop: 16,
-                display: 'flex',
-                justifyContent: 'flex-end',
-              }}
-            >
+          <div
+            style={{
+              marginTop: 16,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            {/* Dropdown chọn số lượng hiển thị */}
+            <div>
+              <b>Hiển thị:</b>{' '}
+              <Select
+                style={{ width: 80 }}
+                value={limit}
+                onChange={(value) => {
+                  setLimit(value);
+                  setPage(1); // Khi đổi limit thì về trang đầu
+                }}
+              >
+                {LIMIT_OPTIONS.map((opt) => (
+                  <Option key={opt} value={opt}>
+                    {opt}
+                  </Option>
+                ))}
+              </Select>
+              <span style={{ marginLeft: 8 }}>task/trang</span>
+            </div>
+            {totalPage > 1 && (
               <Pagination
                 current={page}
-                total={totalPage * PAGE_SIZE}
-                pageSize={PAGE_SIZE}
+                total={totalPage * limit}
+                pageSize={limit}
                 onChange={setPage}
                 showSizeChanger={false}
                 className="custom-pagination"
               />
-            </div>
-          )}
+            )}
+          </div>
         </Spin>
       </Card>
       {selectedTask && (
