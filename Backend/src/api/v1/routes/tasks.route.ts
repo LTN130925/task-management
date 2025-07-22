@@ -6,6 +6,7 @@ import { controller } from '../controllers/tasks.controller';
 const router = Router();
 
 router.get('/', controller.index);
+
 router.get('/detail/:id', controller.detail);
 
 export default router;

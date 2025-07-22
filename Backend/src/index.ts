@@ -1,7 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 
 import { connectDB } from './config/db';
-import indexRoute from './api/v1/routes/index.route';
+import routerApiVer1 from './api/v1/routes/index.route';
 
 // Load environment variables
 import dotenv from 'dotenv';
@@ -15,7 +15,7 @@ const port = process.env.PORT;
 connectDB();
 
 // Routes
-indexRoute(app);
+routerApiVer1(app);
 
 // Start the server
 app.listen(port, () => {
