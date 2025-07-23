@@ -64,6 +64,9 @@ function App() {
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const [limit, setLimit] = useState<number>(5);
+  const [keyword, setKeyword] = useState('');
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Fetch task list
   const fetchTasks = (
@@ -71,7 +74,8 @@ function App() {
     sort_key = 'title',
     sort_value = 'desc',
     pageNum = 1,
-    limitNum = 5
+    limitNum = 5,
+    keywordValue = ''
   ) => {
     setLoading(true);
     let url = API_BASE;
@@ -83,6 +87,8 @@ function App() {
     }
     params.push(`page=${pageNum}`);
     params.push(`limit=${limitNum}`);
+    if (keywordValue)
+      params.push(`keyword=${encodeURIComponent(keywordValue)}`);
     if (params.length > 0) {
       url += '?' + params.join('&');
     }
@@ -91,6 +97,7 @@ function App() {
       .then((res) => {
         setTasks(res.data.data);
         setTotalPage(Number(res.data.pagination.totalPage));
+        setSuggestions(res.data.suggestions || []);
         // KHÔNG setPage từ backend nữa!
       })
       .catch(() => {
@@ -99,6 +106,25 @@ function App() {
       .finally(() => setLoading(false));
   };
 
+  // Fetch suggestions khi nhập từ khóa
+  useEffect(() => {
+    if (keyword.trim() === '') {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+    let url = `${API_BASE}?keyword=${encodeURIComponent(keyword)}&limit=5`;
+    axios
+      .get(url)
+      .then((res) => {
+        setSuggestions(res.data.suggestions || []);
+        setShowSuggestions(true);
+      })
+      .catch(() => {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      });
+  }, [keyword]);
   // Khi filter, sort thay đổi thì về trang 1 (KHÔNG fetchTasks ở đây)
   useEffect(() => {
     setPage(1);
@@ -107,9 +133,9 @@ function App() {
 
   // Khi page hoặc filter, sort thay đổi thì gọi fetchTasks
   useEffect(() => {
-    fetchTasks(statusFilter, sortField, sortOrder, page, limit);
+    fetchTasks(statusFilter, sortField, sortOrder, page, limit, keyword);
     // eslint-disable-next-line
-  }, [page, statusFilter, sortField, sortOrder, limit]);
+  }, [page, statusFilter, sortField, sortOrder, limit, keyword]);
 
   // Fetch task detail
   const fetchDetail = (id: string) => {
@@ -162,16 +188,54 @@ function App() {
   ];
 
   return (
-    <div style={{ maxWidth: 900, margin: '40px auto', padding: 24 }}>
+    <div style={{ maxWidth: 1000, margin: '40px auto', padding: 24 }}>
       <Title level={2} style={{ textAlign: 'center' }}>
         Task Management
       </Title>
       <Card title="Danh sách Task" style={{ marginBottom: 32 }}>
+        {/* Sort controls row - above filter/search */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 8 }}>
+          <Col span={24}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                gap: 16,
+              }}
+            >
+              <b style={{ marginRight: 12 }}>Sắp xếp:</b>
+              <Select
+                style={{ width: 120 }}
+                value={sortField}
+                onChange={setSortField}
+              >
+                {SORT_FIELDS.map((opt) => (
+                  <Option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </Option>
+                ))}
+              </Select>
+              <Select
+                style={{ width: 100 }}
+                value={sortOrder}
+                onChange={setSortOrder}
+              >
+                {SORT_ORDERS.map((opt) => (
+                  <Option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+          </Col>
+        </Row>
+        {/* Filter/search row - below sort controls */}
         <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-          <Col span={12}>
+          <Col span={16} style={{ display: 'flex', alignItems: 'center' }}>
             <b>Lọc theo trạng thái:</b>
             <Select
-              style={{ width: 180, marginLeft: 12 }}
+              style={{ width: 180, marginLeft: 12, height: 36 }}
               value={statusFilter}
               onChange={setStatusFilter}
             >
@@ -182,30 +246,79 @@ function App() {
               ))}
             </Select>
           </Col>
-          <Col span={12} style={{ textAlign: 'right' }}>
-            <b>Sắp xếp:</b>
-            <Select
-              style={{ width: 180, marginLeft: 12 }}
-              value={sortField}
-              onChange={setSortField}
+          <Col span={8} style={{ textAlign: 'right' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'right',
+                width: '100%',
+              }}
             >
-              {SORT_FIELDS.map((opt) => (
-                <Option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </Option>
-              ))}
-            </Select>
-            <Select
-              style={{ width: 120, marginLeft: 8 }}
-              value={sortOrder}
-              onChange={setSortOrder}
-            >
-              {SORT_ORDERS.map((opt) => (
-                <Option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </Option>
-              ))}
-            </Select>
+              <b style={{ marginRight: 8 }}>Tìm kiếm:</b>
+              <div
+                style={{
+                  position: 'relative',
+                  display: 'inline-block',
+                  width: '100%',
+                  maxWidth: 400,
+                }}
+              >
+                <input
+                  type="text"
+                  value={keyword}
+                  onChange={(e) => {
+                    setKeyword(e.target.value);
+                    setShowSuggestions(true);
+                  }}
+                  placeholder="Nhập từ khóa..."
+                  style={{
+                    width: '100%',
+                    padding: '6px 12px',
+                    borderRadius: 4,
+                    border: '1px solid #ccc',
+                    height: 36,
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={() => keyword && setShowSuggestions(true)}
+                  onBlur={() =>
+                    setTimeout(() => setShowSuggestions(false), 200)
+                  }
+                />
+                {showSuggestions && suggestions.length > 0 && (
+                  <ul
+                    style={{
+                      position: 'absolute',
+                      top: '40px',
+                      left: 0,
+                      right: 0,
+                      background: '#fff',
+                      border: '1px solid #ccc',
+                      borderRadius: 4,
+                      zIndex: 10,
+                      listStyle: 'none',
+                      margin: 0,
+                      padding: 0,
+                      maxHeight: 180,
+                      overflowY: 'auto',
+                    }}
+                  >
+                    {suggestions.map((sug, idx) => (
+                      <li
+                        key={sug + idx}
+                        style={{ padding: '8px 12px', cursor: 'pointer' }}
+                        onMouseDown={() => {
+                          setKeyword(sug);
+                          setShowSuggestions(false);
+                        }}
+                      >
+                        {sug}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
           </Col>
         </Row>
         <Spin spinning={loading} tip="Đang tải...">

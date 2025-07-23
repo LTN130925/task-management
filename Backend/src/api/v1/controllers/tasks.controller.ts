@@ -34,6 +34,14 @@ export const controller = {
       totalTasks,
       req.query
     );
+    // search
+    const objectKeyword: any = {
+      keyword: '',
+    };
+    if (req.query.keyword) {
+      objectKeyword.keyword = req.query.keyword as string;
+      filter.title = new RegExp(objectKeyword.keyword, 'i');
+    }
 
     const tasks = await Task.find(filter)
       .sort(sort)
@@ -44,14 +52,7 @@ export const controller = {
       success: true,
       data: tasks,
       pagination: helperPagination,
-      /*
-      pagination: {
-        totalPage: 5,
-        skip: 0,
-        limit: 5,
-        page: 1,
-      }
-      */
+      suggestions: tasks.map((task) => task.title),
     });
   },
 
