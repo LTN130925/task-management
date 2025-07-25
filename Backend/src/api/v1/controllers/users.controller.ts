@@ -318,4 +318,40 @@ export const controller = {
       });
     }
   },
+
+  // [GET] /api/v1/user/profile
+  profile: async (req: Request, res: Response) => {
+    try {
+      const token = req.cookies.token;
+      if (!token) {
+        return res
+          .status(401)
+          .json({ success: false, message: 'Vui được đăng nhập' });
+      }
+      const decoded = jwt.verify(
+        token,
+        process.env.SECRET_KEY as string
+      ) as any;
+      const user = await User.findOne({
+        _id: decoded.userId,
+        status: 'active',
+        deleted: false,
+      }).select('-password -_id');
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'Tài khoản người dùng bị khóa',
+        });
+      }
+      res.status(200).json({
+        success: true,
+        data: user,
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 };

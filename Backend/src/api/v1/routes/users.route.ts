@@ -26,4 +26,7 @@ router.post('/password/otp', userValidator.otpPassword, controller.otpPassword);
 // [POST] /api/v1/user/reset-password
 router.post('/password/reset', userValidator.resetPassword, controller.resetPassword);
 
+// [GET] /api/v1/user/profile
+router.get('/profile', controller.profile);
+
 export default router;
