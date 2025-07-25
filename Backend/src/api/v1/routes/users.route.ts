@@ -17,4 +17,13 @@ router.post('/refresh-token', controller.refreshToken);
 // [POST] /api/v1/user/logout
 router.post('/logout', controller.logout);
 
+// [POST] /api/v1/user/forgot-password
+router.post('/password/forgot', userValidator.forgotPassword, controller.forgotPassword);
+
+// [POST] /api/v1/user/otp-password
+router.post('/password/otp', userValidator.otpPassword, controller.otpPassword);
+
+// [POST] /api/v1/user/reset-password
+router.post('/password/reset', userValidator.resetPassword, controller.resetPassword);
+
 export default router;
