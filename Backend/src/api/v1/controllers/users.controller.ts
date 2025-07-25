@@ -76,6 +76,13 @@ export const controller = {
         });
       }
 
+      if (user.status === 'inactive') {
+        return res.status(403).json({
+          success: false,
+          message: 'Tài khoản của bạn đã bị khóa',
+        });
+      }
+
       const payload: any = {
         userId: user.id,
         fullName: user.fullName,

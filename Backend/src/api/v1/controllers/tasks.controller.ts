@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import Task from '../models/tasks.model';
 
 // helper
-import { pagination } from '../../../../helpers/pagination';
+import { pagination } from '../../../helpers/pagination';
 
 export const controller = {
   // [GET] /api/v1/tasks
@@ -88,8 +88,6 @@ export const controller = {
   // [PATCH] /api/v1/tasks/change-status/:id
   changeStatus: async (req: Request, res: Response) => {
     try {
-      // i have been check validation in change-status.validator.ts
-      // so i don't need to check again here
       const { id } = req.params;
       const { status } = req.body;
 
