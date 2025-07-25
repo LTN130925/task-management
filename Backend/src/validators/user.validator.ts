@@ -111,7 +111,7 @@ export const userValidator = {
     if (req.body.password !== req.body.confirmPassword) {
       return res.status(400).json({
         success: false,
-        message: 'Mật khóa mới khớp',
+        message: 'Mật khẩu không khớp',
       });
     }
 

@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { controller } from '../controllers/users.controller';
 import { userValidator } from '../../../validators/user.validator';
+import { Auth } from '../middlewares/auth.middleware';
 
 const router = Router();
 
@@ -17,16 +18,25 @@ router.post('/refresh-token', controller.refreshToken);
 // [POST] /api/v1/user/logout
 router.post('/logout', controller.logout);
 
-// [POST] /api/v1/user/forgot-password
-router.post('/password/forgot', userValidator.forgotPassword, controller.forgotPassword);
+// [POST] /api/v1/user/password/forgot
+router.post(
+  '/password/forgot',
+  userValidator.forgotPassword,
+  controller.forgotPassword
+);
 
-// [POST] /api/v1/user/otp-password
+// [POST] /api/v1/user/password/otp
 router.post('/password/otp', userValidator.otpPassword, controller.otpPassword);
 
-// [POST] /api/v1/user/reset-password
-router.post('/password/reset', userValidator.resetPassword, controller.resetPassword);
+// [POST] /api/v1/user/password/reset
+router.post(
+  '/password/reset',
+  Auth.requireAuth,
+  userValidator.resetPassword,
+  controller.resetPassword
+);
 
 // [GET] /api/v1/user/profile
-router.get('/profile', controller.profile);
+router.get('/profile', Auth.requireAuth, controller.profile);
 
 export default router;

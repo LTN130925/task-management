@@ -1,12 +1,10 @@
 import mongoose from 'mongoose';
 
-import { generateRandom } from '../../../helpers/generateRandom';
-
 const forgotPasswordSchema = new mongoose.Schema({
   email: String,
   otp: {
     type: String,
-    default: generateRandom.typeNumber(8) as string,
+    default: '',
   },
   expireAt: {
     type: Date,
@@ -16,6 +14,10 @@ const forgotPasswordSchema = new mongoose.Schema({
 
 forgotPasswordSchema.index({ expireAt: 1 }, { expireAfterSeconds: 60 * 2 });
 
-const ForgotPassword = mongoose.model('ForgotPassword', forgotPasswordSchema, 'forgot-passwords');
+const ForgotPassword = mongoose.model(
+  'ForgotPassword',
+  forgotPasswordSchema,
+  'forgot-passwords'
+);
 
 export default ForgotPassword;
