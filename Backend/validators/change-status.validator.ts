@@ -5,13 +5,13 @@ export const changeStatusValidator = {
     if (!req.params.id) {
       return res.status(400).json({
         success: false,
-        message: 'Task ID is required',
+        message: 'Task ID không tồn tại',
       });
     }
     if (!req.body.status) {
       return res.status(400).json({
         success: false,
-        message: 'Status is required',
+        message: 'Trạng thái không tồn tại',
       });
     }
     const validStatuses = [
@@ -24,7 +24,7 @@ export const changeStatusValidator = {
     if (!validStatuses.includes(req.body.status)) {
       return res.status(400).json({
         success: false,
-        message: `Invalid status. Valid statuses are: ${validStatuses.join(
+        message: `Không tìm thấy trạng thái. Trạng thái hợp lý: ${validStatuses.join(
           ', '
         )}`,
       });
@@ -38,7 +38,7 @@ export const changeStatusValidator = {
     if (!ids || !Array.isArray(ids)) {
       return res.status(400).json({
         success: false,
-        message: 'IDs are required',
+        message: 'Danh sách task ID không tồn tại',
       });
     }
     const validatorValues = [
@@ -51,7 +51,7 @@ export const changeStatusValidator = {
     if (key === 'status' && !validatorValues.includes(value)) {
       return res.status(400).json({
         success: false,
-        message: `Invalid value. Valid values are: ${validatorValues.join(
+        message: `Không tìm thấy trạng thái. Trạng thái hợp lý: ${validatorValues.join(
           ', '
         )}`,
       });

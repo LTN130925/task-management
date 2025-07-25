@@ -6,7 +6,7 @@ export const createValidator = {
     if (!req.body.title) {
       return res.status(400).json({
         success: false,
-        message: 'Title is required',
+        message: 'Tiêu đề không tồn tại',
       });
     }
 

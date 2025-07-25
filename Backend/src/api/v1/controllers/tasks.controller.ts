@@ -70,7 +70,7 @@ export const controller = {
       if (!task) {
         return res.status(404).json({
           success: false,
-          message: 'Task not found',
+          message: 'Task không tìm thấy',
         });
       }
       res.status(200).json({
@@ -80,7 +80,7 @@ export const controller = {
     } catch (error) {
       return res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: 'Lỗi server',
       });
     }
   },
@@ -97,19 +97,19 @@ export const controller = {
       if (!task) {
         return res.status(404).json({
           success: false,
-          message: 'Task not found',
+          message: 'Task không tìm thấy',
         });
       }
 
       await Task.updateOne({ _id: id }, { status: status });
       res.status(200).json({
         success: true,
-        message: 'Task status updated successfully',
+        message: 'Task cập nhật trạng thái thành công',
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: 'Lỗi server',
       });
     }
   },
@@ -128,12 +128,12 @@ export const controller = {
       );
       res.status(200).json({
         success: true,
-        message: 'Tasks updated successfully',
+        message: 'Task cập nhật trạng thái thành công',
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: 'Lỗi server',
       });
     }
   },
@@ -145,13 +145,13 @@ export const controller = {
       await newTask.save();
       res.status(201).json({
         success: true,
-        message: 'Task created successfully',
+        message: 'Task tạo thành công',
         data: newTask,
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: 'Lỗi server',
       });
     }
   },
@@ -164,19 +164,19 @@ export const controller = {
       if (!task) {
         return res.status(404).json({
           success: false,
-          message: 'Task not found',
+          message: 'Task không tìm thấy',
         });
       }
 
       await Task.updateOne({ _id: id }, req.body);
       res.status(200).json({
         success: true,
-        message: 'Task updated successfully',
+        message: 'Task cập nhật thành công',
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: 'Lỗi server',
       });
     }
   },
@@ -189,19 +189,19 @@ export const controller = {
       if (!task) {
         return res.status(404).json({
           success: false,
-          message: 'Task not found',
+          message: 'Task không tìm thấy',
         });
       }
 
       await Task.updateOne({ _id: id }, { deleted: true });
       res.status(200).json({
         success: true,
-        message: 'Task deleted successfully',
+        message: 'Task xóa thành công',
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: 'Lỗi server',
       });
     }
   },
