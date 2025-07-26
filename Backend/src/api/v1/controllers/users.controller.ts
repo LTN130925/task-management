@@ -135,14 +135,13 @@ export const controller = {
   // [POST] /api/v1/user/refresh-token
   refreshToken: async (req: Request, res: Response) => {
     try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader) {
+      const { refreshToken } = req.body;
+      if (!refreshToken) {
         return res.status(401).json({
           success: false,
           message: 'Vui lòng đăng nhập',
         });
       }
-      const refreshToken = authHeader.split(' ')[1];
       const decoded = jwt.verify(
         refreshToken,
         process.env.REFRESH_SECRET as string
