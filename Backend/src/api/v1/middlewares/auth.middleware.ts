@@ -30,7 +30,7 @@ export const Auth = {
         });
       }
 
-      (req as any).user = user;
+      req.user = user;
       next();
     } catch (err) {
       return res.status(500).json({

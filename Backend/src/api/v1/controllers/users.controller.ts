@@ -292,7 +292,7 @@ export const controller = {
     try {
       const hashPassword = await bcrypt.hash(req.body.password, 10);
       await User.updateOne(
-        { _id: (req as any).user.id },
+        { _id: req.user.id },
         { password: hashPassword }
       );
 
@@ -312,7 +312,7 @@ export const controller = {
     try {
       res.status(200).json({
         success: true,
-        data: (req as any).user,
+        data: req.user,
       });
     } catch (err) {
       res.status(500).json({
