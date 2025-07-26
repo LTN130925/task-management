@@ -4,11 +4,16 @@ const taskSchema = new mongoose.Schema(
   {
     title: String,
     status: {
-      type: String, 
+      type: String,
       enum: ['initial', 'doing', 'finish', 'pending', 'notFinish'],
       default: 'initial',
     },
     content: String,
+    createdBy: String,
+    listUsers: {
+      type: Array,
+      default: [],
+    },
     timeStart: Date,
     timeFinish: Date,
     deleted: {

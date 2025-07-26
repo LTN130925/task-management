@@ -18,6 +18,8 @@ const userSchema = new mongoose.Schema<IUser>({
     default: false,
   },
   deletedAt: Date,
+}, {
+  timestamps: true,
 });
 
 const User = mongoose.model<IUser>('User', userSchema, 'users');

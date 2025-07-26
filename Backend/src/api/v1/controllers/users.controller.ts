@@ -308,4 +308,23 @@ export const controller = {
       });
     }
   },
+
+  // [GET] /api/v1/user/list
+  list: async (req: Request, res: Response) => {
+    try {
+      const users = await User.find({
+        deleted: false,
+        status: 'active',
+      }).select('fullName email');
+      res.status(200).json({
+        success: true,
+        data: users,
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 };

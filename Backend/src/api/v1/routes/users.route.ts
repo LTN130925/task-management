@@ -39,4 +39,7 @@ router.post(
 // [GET] /api/v1/user/profile
 router.get('/profile', Auth.requireAuth, controller.profile);
 
+// [GET] /api/v1/user/list
+router.get('/list', Auth.requireAuth, controller.list);
+
 export default router;
