@@ -46,14 +46,12 @@ export const controller = {
         }
       );
 
-      res
-        .cookie('token', accessToken, { httpOnly: true })
-        .cookie('refreshToken', refreshToken, { httpOnly: true })
-        .status(201)
-        .json({
-          success: true,
-          message: 'Đăng ký thành công',
-        });
+      res.status(201).json({
+        success: true,
+        message: 'Đăng ký thành công',
+        accessToken,
+        refreshToken,
+      });
     } catch (err) {
       return res.status(500).json({
         success: false,
@@ -105,14 +103,12 @@ export const controller = {
         }
       );
 
-      res
-        .cookie('token', accessToken, { httpOnly: true })
-        .cookie('refreshToken', refreshToken, { httpOnly: true })
-        .status(200)
-        .json({
-          success: true,
-          message: 'Đăng nhập thành công',
-        });
+      res.status(200).json({
+        success: true,
+        message: 'Đăng nhập thành công',
+        accessToken,
+        refreshToken,
+      });
     } catch (err) {
       return res.status(500).json({
         success: false,
@@ -124,7 +120,7 @@ export const controller = {
   // [POST] /api/v1/user/logout
   logout: async (req: Request, res: Response) => {
     try {
-      res.clearCookie('token').clearCookie('refreshToken').status(200).json({
+      res.status(200).json({
         success: true,
         message: 'Đăng xuất thành công',
       });
@@ -139,18 +135,18 @@ export const controller = {
   // [POST] /api/v1/user/refresh-token
   refreshToken: async (req: Request, res: Response) => {
     try {
-      const refreshToken = req.cookies.refreshToken;
-      if (!refreshToken) {
+      const authHeader = req.headers.authorization;
+      if (!authHeader) {
         return res.status(401).json({
           success: false,
           message: 'Vui lòng đăng nhập',
         });
       }
+      const refreshToken = authHeader.split(' ')[1];
       const decoded = jwt.verify(
         refreshToken,
         process.env.REFRESH_SECRET as string
       ) as any;
-
       const user = await User.findOne({
         _id: decoded.userId,
         deleted: false,
@@ -162,21 +158,18 @@ export const controller = {
           message: 'Vui lòng đăng nhập',
         });
       }
-
-      const payload = {
+      const payload: any = {
         userId: user.id,
         fullName: user.fullName,
         status: user.status,
       };
-      const newAccessToken = jwt.sign(
-        payload,
-        process.env.SECRET_KEY as string,
-        { expiresIn: '15m' }
-      );
 
-      res.cookie('token', newAccessToken, { httpOnly: true }).status(200).json({
+      const accessToken = jwt.sign(payload, process.env.SECRET_KEY as string, {
+        expiresIn: '15m',
+      });
+      res.status(200).json({
         success: true,
-        message: 'Token mới được cập',
+        accessToken,
       });
     } catch (err) {
       return res.status(500).json({
@@ -271,14 +264,12 @@ export const controller = {
           expiresIn: '7d',
         }
       );
-      res
-        .cookie('token', accessToken, { httpOnly: true })
-        .cookie('refreshToken', refreshToken, { httpOnly: true })
-        .status(200)
-        .json({
-          success: true,
-          message: 'Xác thực thành công',
-        });
+      res.status(200).json({
+        success: true,
+        message: 'Xác thực thành công',
+        accessToken,
+        refreshToken,
+      });
     } catch (err) {
       res.status(500).json({
         success: false,
@@ -291,10 +282,7 @@ export const controller = {
   resetPassword: async (req: Request, res: Response) => {
     try {
       const hashPassword = await bcrypt.hash(req.body.password, 10);
-      await User.updateOne(
-        { _id: req.user.id },
-        { password: hashPassword }
-      );
+      await User.updateOne({ _id: req.user.id }, { password: hashPassword });
 
       res
         .status(200)
