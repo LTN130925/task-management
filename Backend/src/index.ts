@@ -14,8 +14,8 @@ import { connectDB } from './config/db';
 connectDB();
 
 // Routes
-import routerApiVer1 from './api/v1/client/routes/index.route';
-
+import routerApiClientVer1 from './api/v1/client/routes/index.route';
+import routerApiAdminVer1 from './api/v1/admin/routes/index.route';
 
 // Initialize Express
 const app: Application = express();
@@ -31,7 +31,9 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Routes
-routerApiVer1(app);
+// => v1
+routerApiClientVer1(app);
+routerApiAdminVer1(app);
 
 // Start the server
 app.listen(port, () => {
