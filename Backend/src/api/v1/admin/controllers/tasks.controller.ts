@@ -6,6 +6,7 @@ import User from '../../../../models/users.model';
 
 // helpers
 import { pagination } from '../../../../helpers/pagination';
+import { getSubTask } from '../../../../helpers/categoryTaskChild';
 
 export const controller = {
   // [GET] /admin/api/v1/dropdowns/users
@@ -103,6 +104,34 @@ export const controller = {
       res.status(200).json({
         success: true,
         data: task,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [GET] /admin/api/v1/tasks/detail/:id/subtasks
+  subtasks: async (req: Request, res: Response) => {
+    try {
+      const task: any = await Task.findOne({
+        _id: req.params.id,
+        deleted: false,
+      });
+
+      if (!task) {
+        return res.status(404).json({
+          success: false,
+          message: 'Task not found',
+        });
+      }
+
+      const subtasks = await getSubTask(task.id);
+      res.status(200).json({
+        success: true,
+        data: subtasks,
       });
     } catch (error) {
       return res.status(500).json({

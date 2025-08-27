@@ -95,7 +95,7 @@ export const controller = {
       const task: any = await Task.findOne({
         _id: id,
         deleted: false,
-      }).lean();
+      });
 
       if (!task) {
         return res.status(404).json({
@@ -104,7 +104,7 @@ export const controller = {
         });
       }
 
-      const subtasks = await getSubTask(task._id);
+      const subtasks = await getSubTask(task.id);
       res.status(200).json({
         success: true,
         data: subtasks,

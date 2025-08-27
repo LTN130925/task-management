@@ -9,4 +9,8 @@ router.get('/dropdowns/users', controller.dropdowns);
 
 router.get('/', controller.index);
 
+router.get('/detail/:id', controller.detail);
+
+router.get('/detail/:id/subtasks', controller.subtasks);
+
 export default router;
