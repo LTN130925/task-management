@@ -12,6 +12,9 @@ router.get('/', controller.index);
 // [GET] /api/v1/tasks/detail/:id
 router.get('/detail/:id', controller.detail);
 
+// [GET] /api/v1/tasks/detail/:id/subtasks
+router.get('/detail/:id/subtasks', controller.subtasks);
+
 // [PATCH] /api/v1/tasks/change-status/:id
 router.patch(
   '/change-status/:id',

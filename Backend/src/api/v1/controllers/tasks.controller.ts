@@ -5,6 +5,7 @@ import Task from '../models/tasks.model';
 
 // helper
 import { pagination } from '../../../helpers/pagination';
+import { getSubTask } from '../../../helpers/categoryTaskChild';
 
 export const controller = {
   // [GET] /api/v1/tasks
@@ -63,7 +64,7 @@ export const controller = {
   detail: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const task = await Task.findOne({
+      const task: any = await Task.findOne({
         _id: id,
         deleted: false,
       });
@@ -74,9 +75,39 @@ export const controller = {
           message: 'Task không tìm thấy',
         });
       }
+
       res.status(200).json({
         success: true,
         data: task,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [GET] /api/v1/tasks/detail/:id/subtasks
+  subtasks: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const task: any = await Task.findOne({
+        _id: id,
+        deleted: false,
+      }).lean();
+
+      if (!task) {
+        return res.status(404).json({
+          success: false,
+          message: 'Task không tìm thấy',
+        });
+      }
+
+      const subtasks = await getSubTask(task._id);
+      res.status(200).json({
+        success: true,
+        data: subtasks,
       });
     } catch (error) {
       return res.status(500).json({
