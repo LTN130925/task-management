@@ -74,7 +74,6 @@ export const controller = {
       for (const task of tasks) {
         const user = await User.findOne({
           _id: task.createdBy,
-          status: 'active',
           deleted: false,
         }).lean();
         task.userCreatedBy = user?.fullName;
@@ -227,6 +226,48 @@ export const controller = {
         message: 'Task cập nhật trạng thái thông',
       });
     } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  //                                TRASH
+  // [GET] /admin/api/v1/tasks/trash/index
+  trash: async (req: Request, res: Response) => {
+    try {
+      const find: any = {
+        deleted: true,
+      };
+
+      // search
+      const objectKeyword: any = {
+        keyword: '',
+      };
+      if (req.query.keyword) {
+        objectKeyword.keyword = req.query.keyword as string;
+        find.title = new RegExp(objectKeyword.keyword, 'i');
+      }
+
+      // filter by createdBy
+      if (req.query.createdBy) {
+        find.createdBy = req.query.createdBy;
+      }
+
+      const tasks: any = await Task.find(find).lean();
+      for (const task of tasks) {
+        const user: any = await User.findOne({
+          _id: task.createdBy,
+        }).lean();
+        task.userCreatedBy = user?.fullName;
+      }
+
+      res.status(200).json({
+        success: true,
+        data: tasks,
+      });
+    } catch (error) {
       return res.status(500).json({
         success: false,
         message: 'Lỗi server',

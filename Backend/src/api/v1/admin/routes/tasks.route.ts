@@ -7,6 +7,9 @@ import { controller } from '../../admin/controllers/tasks.controller';
 import { changeStatusValidator } from '../../admin/validators/change-status.validator';
 import { createValidator } from '../../admin/validators/create.validator';
 
+// config
+import systemConfig from '../../../../config/system';
+
 const router = Router();
 
 // [GET] /admin/api/v1/dropdowns/users
@@ -43,5 +46,9 @@ router.patch(
   changeStatusValidator.changeMulti,
   controller.changeMulti
 );
+
+//                    TRASH
+// [GET] /admin/api/v1/tasks/trash/index
+router.get(`${systemConfig.prefixTrash}/index`, controller.trash);
 
 export default router;
