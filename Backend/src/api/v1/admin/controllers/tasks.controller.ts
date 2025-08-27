@@ -292,4 +292,21 @@ export const controller = {
       });
     }
   },
+
+  // [PATCH] /admin/api/v1/tasks/trash/restore/:id
+  restore: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      await Task.updateOne({ _id: id }, { deleted: false });
+      res.status(200).json({
+        success: true,
+        message: 'Task cập nhật thành công',
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 };
