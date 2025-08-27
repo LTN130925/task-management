@@ -3,8 +3,8 @@ import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 
 // models
-import User from '../models/users.model';
-import ForgotPassword from '../models/forgotPassword.model';
+import User from '../../../../models/users.model';
+import ForgotPassword from '../../../../models/forgotPassword.model';
 
 // helpers
 import sendMail from '../../../../helpers/sendMail';

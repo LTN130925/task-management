@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-import User from '../models/users.model';
+import User from '../../../../models/users.model';
 
 export const Auth = {
   requireAuth: async (req: Request, res: Response, next: any) => {

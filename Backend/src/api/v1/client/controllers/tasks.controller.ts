@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 // models
-import Task from '../models/tasks.model';
+import Task from '../../../../models/tasks.model';
 
 // helper
 import { pagination } from '../../../../helpers/pagination';
