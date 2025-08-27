@@ -92,4 +92,23 @@ export const controller = {
       });
     }
   },
+
+  // [GET] /admin/api/v1/tasks/detail/:id
+  detail: async (req: Request, res: Response) => {
+    try {
+      const task = await Task.findOne({
+        _id: req.params.id,
+        deleted: false,
+      }).lean();
+      res.status(200).json({
+        success: true,
+        data: task,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 };
