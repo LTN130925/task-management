@@ -266,8 +266,26 @@ export const controller = {
       res.status(200).json({
         success: true,
         data: tasks,
+        suggestions: tasks.map((task: any) => task.title),
       });
     } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [DELETE] /admin/api/v1/tasks/trash/delete/:id
+  deleteTrash: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      await Task.deleteOne({ _id: id });
+      res.status(200).json({
+        success: true,
+        message: 'Task xóa thành công',
+      });
+    } catch (err) {
       return res.status(500).json({
         success: false,
         message: 'Lỗi server',

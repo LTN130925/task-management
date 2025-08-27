@@ -51,4 +51,7 @@ router.patch(
 // [GET] /admin/api/v1/tasks/trash/index
 router.get(`${systemConfig.prefixTrash}/index`, controller.trash);
 
+// [DELETE] /admin/api/v1/tasks/trash/delete/:id
+router.delete(`${systemConfig.prefixTrash}/delete/:id`, controller.deleteTrash);
+
 export default router;
