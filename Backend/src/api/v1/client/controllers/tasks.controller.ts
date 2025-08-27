@@ -32,7 +32,7 @@ export const controller = {
     const helperPagination = pagination(
       {
         page: 1,
-        limit: 2,
+        limit: 4,
       },
       totalTasks,
       req.query
