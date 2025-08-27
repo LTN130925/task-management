@@ -51,10 +51,20 @@ router.patch(
 // [GET] /admin/api/v1/tasks/trash/index
 router.get(`${systemConfig.prefixTrash}/index`, controller.trash);
 
+// [GET] /admin/api/v1/tasks/trash/detail/:id
+router.get(`${systemConfig.prefixTrash}/detail/:id`, controller.detailTrash);
+
 // [DELETE] /admin/api/v1/tasks/trash/delete/:id
 router.delete(`${systemConfig.prefixTrash}/delete/:id`, controller.deleteTrash);
 
 // [PATCH] /admin/api/v1/tasks/trash/restore/:id
 router.patch(`${systemConfig.prefixTrash}/restore/:id`, controller.restore);
+
+// [PATCH] /admin/api/v1/tasks/trash/change-multi
+router.patch(
+  `${systemConfig.prefixTrash}/change-multi`,
+  changeStatusValidator.changeMulti,
+  controller.changeMulti
+);
 
 export default router;

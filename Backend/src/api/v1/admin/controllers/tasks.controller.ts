@@ -211,17 +211,42 @@ export const controller = {
   },
 
   // [PATCH] /admin/api/v1/tasks/change-multi
+  // [PATCH] /admin/api/v1/tasks/trash/change-multi
   changeMulti: async (req: Request, res: Response) => {
     try {
-      if (req.body.key === 'deleted') {
-        req.body.value = true;
+      switch (req.body.key) {
+        case 'deleted':
+          req.body.value = true;
+          break;
+        // => TRASH
+        case 'restore':
+          req.body.value = false;
+          break;
+        case 'deleted-permanently':
+          await Task.deleteMany({
+            _id: { $in: req.body.ids },
+            deleted: true,
+          });
+          return res.status(200).json({
+            success: true,
+            message: 'Task xóa vĩnh viễn thành công',
+          });
+        // END TRASH
+        default:
+          res.status(500).json({
+            success: false,
+            message: 'Lỗi server',
+          });
       }
       const { ids, key, value } = req.body;
       await Task.updateMany(
-        { _id: { $in: ids }, deleted: false },
-        { [key]: value }
+        {
+          _id: { $in: ids },
+          deleted: req.body.key === 'restore' ? true : false,
+        },
+        { [key === 'restore' ? 'deleted' : key]: value }
       );
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: 'Task cập nhật trạng thái thông',
       });
@@ -276,11 +301,30 @@ export const controller = {
     }
   },
 
+  // [GET] /admin/api/v1/tasks/trash/detail/:id
+  detailTrash: async (req: Request, res: Response) => {
+    try {
+      const task = await Task.findOne({
+        _id: req.params.id,
+        deleted: true,
+      }).lean();
+      res.status(200).json({
+        success: true,
+        data: task,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
   // [DELETE] /admin/api/v1/tasks/trash/delete/:id
   deleteTrash: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      await Task.deleteOne({ _id: id });
+      await Task.deleteOne({ _id: id, deleted: true });
       res.status(200).json({
         success: true,
         message: 'Task xóa thành công',
@@ -297,7 +341,7 @@ export const controller = {
   restore: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      await Task.updateOne({ _id: id }, { deleted: false });
+      await Task.updateOne({ _id: id, deleted: true }, { deleted: false });
       res.status(200).json({
         success: true,
         message: 'Task cập nhật thành công',
