@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 import isValidPassword from '../../../../helpers/securePassword';
 
 export const userValidator = {
-  register: (req: Request, res: Response, next: any) => {
+  register: (req: Request, res: Response, next: NextFunction) => {
     if (!req.body.fullName) {
       return res.status(400).json({
         success: false,
@@ -44,7 +44,7 @@ export const userValidator = {
     next();
   },
 
-  login: (req: Request, res: Response, next: any) => {
+  login: (req: Request, res: Response, next: NextFunction) => {
     if (!req.body.email) {
       return res.status(400).json({
         success: false,
@@ -61,7 +61,7 @@ export const userValidator = {
     next();
   },
 
-  forgotPassword: (req: Request, res: Response, next: any) => {
+  forgotPassword: (req: Request, res: Response, next: NextFunction) => {
     if (!req.body.email) {
       return res.status(400).json({
         success: false,
@@ -72,7 +72,7 @@ export const userValidator = {
     next();
   },
 
-  otpPassword: (req: Request, res: Response, next: any) => {
+  otpPassword: (req: Request, res: Response, next: NextFunction) => {
     if (!req.body.email) {
       return res.status(400).json({
         success: false,
@@ -89,7 +89,7 @@ export const userValidator = {
     next();
   },
 
-  resetPassword: (req: Request, res: Response, next: any) => {
+  resetPassword: (req: Request, res: Response, next: NextFunction) => {
     if (!req.body.password) {
       return res.status(400).json({
         success: false,

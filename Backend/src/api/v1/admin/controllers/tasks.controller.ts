@@ -140,4 +140,97 @@ export const controller = {
       });
     }
   },
+
+  // [POST] /admin/api/v1/tasks/create
+  create: async (req: Request, res: Response) => {
+    try {
+      const newTask = new Task(req.body);
+      await newTask.save();
+      res.status(201).json({
+        success: true,
+        message: 'Task tạo thành công',
+        data: newTask,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [PATCH] /admin/api/v1/tasks/edit/:id
+  edit: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      await Task.updateOne({ _id: id }, req.body);
+      res.status(200).json({
+        success: true,
+        message: 'Task cập nhật thành công',
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [DELETE] /admin/api/v1/tasks/delete/:id
+  delete: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      await Task.updateOne({ _id: id }, { deleted: true });
+      res.status(200).json({
+        success: true,
+        message: 'Task xóa thành công',
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [PATCH] /admin/api/v1/tasks/change-status/:id
+  changeStatus: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      await Task.updateOne({ _id: id }, { status: status });
+      res.status(200).json({
+        success: true,
+        message: 'Task cập nhật trạng thái thông',
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [PATCH] /admin/api/v1/tasks/change-multi
+  changeMulti: async (req: Request, res: Response) => {
+    try {
+      if (req.body.key === 'deleted') {
+        req.body.value = true;
+      }
+      const { ids, key, value } = req.body;
+      await Task.updateMany(
+        { _id: { $in: ids }, deleted: false },
+        { [key]: value }
+      );
+      res.status(200).json({
+        success: true,
+        message: 'Task cập nhật trạng thái thông',
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 };
