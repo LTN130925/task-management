@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import isValidPassword from '../helpers/securePassword';
+import isValidPassword from '../../../../helpers/securePassword';
 
 export const userValidator = {
   register: (req: Request, res: Response, next: any) => {
