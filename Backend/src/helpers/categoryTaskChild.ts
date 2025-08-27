@@ -1,4 +1,4 @@
-import Task from '../api/v1/models/tasks.model';
+import Task from '../api/v1/client/models/tasks.model';
 
 export const getSubTask = async (id: string) => {
   const getSubTask = async (parentId: string) => {

@@ -7,8 +7,8 @@ import User from '../models/users.model';
 import ForgotPassword from '../models/forgotPassword.model';
 
 // helpers
-import sendMail from '../../../helpers/sendMail';
-import { generateRandom } from '../../../helpers/generateRandom';
+import sendMail from '../../../../helpers/sendMail';
+import { generateRandom } from '../../../../helpers/generateRandom';
 
 export const controller = {
   // [POST] /api/v1/user/register
@@ -297,6 +297,22 @@ export const controller = {
   // [GET] /api/v1/user/profile
   profile: async (req: Request, res: Response) => {
     try {
+      res.status(200).json({
+        success: true,
+        data: req.user,
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [PATCH] /api/v1/user/profile/edit
+  editProfile: async (req: Request, res: Response) => {
+    try {
+      await User.updateOne({ _id: req.user.id }, req.body);
       res.status(200).json({
         success: true,
         data: req.user,

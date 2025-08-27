@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import { controller } from '../controllers/users.controller';
-import { userValidator } from '../../../validators/user.validator';
+import { userValidator } from '../../../../validators/user.validator';
 import { Auth } from '../middlewares/auth.middleware';
 
 const router = Router();
@@ -38,6 +38,9 @@ router.post(
 
 // [GET] /api/v1/user/profile
 router.get('/profile', Auth.requireAuth, controller.profile);
+
+// [PATCH] /api/v1/user/profile/edit
+router.patch('/profile/edit', Auth.requireAuth, controller.editProfile);
 
 // [GET] /api/v1/user/list
 router.get('/list', Auth.requireAuth, controller.list);

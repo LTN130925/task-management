@@ -14,7 +14,7 @@ import { connectDB } from './config/db';
 connectDB();
 
 // Routes
-import routerApiVer1 from './api/v1/routes/index.route';
+import routerApiVer1 from './api/v1/client/routes/index.route';
 
 
 // Initialize Express

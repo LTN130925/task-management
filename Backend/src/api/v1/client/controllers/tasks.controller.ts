@@ -4,8 +4,8 @@ import { Request, Response } from 'express';
 import Task from '../models/tasks.model';
 
 // helper
-import { pagination } from '../../../helpers/pagination';
-import { getSubTask } from '../../../helpers/categoryTaskChild';
+import { pagination } from '../../../../helpers/pagination';
+import { getSubTask } from '../../../../helpers/categoryTaskChild';
 
 export const controller = {
   // [GET] /api/v1/tasks

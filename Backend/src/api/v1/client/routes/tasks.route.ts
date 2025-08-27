@@ -1,8 +1,8 @@
 import { Router } from 'express';
 
 import { controller } from '../controllers/tasks.controller';
-import { changeStatusValidator } from '../../../validators/change-status.validator';
-import { createValidator } from '../../../validators/create.validator';
+import { changeStatusValidator } from '../../../../validators/change-status.validator';
+import { createValidator } from '../../../../validators/create.validator';
 
 const router = Router();
 
