@@ -56,7 +56,6 @@ export const controller = {
       success: true,
       data: tasks,
       pagination: helperPagination,
-      suggestions: tasks.map((task) => task.title),
     });
   },
 

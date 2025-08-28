@@ -25,16 +25,16 @@ export const controller = {
   // [GET] /admin/api/v1/tasks
   index: async (req: Request, res: Response) => {
     try {
-      const find: any = {
+      const filter: any = {
         deleted: false,
       };
 
       // filter by status, userCreatedBy
-      if (req.query.status) {
-        find.status = req.query.status;
-      }
-      if (req.query.createdBy) {
-        find.createdBy = req.query.createdBy;
+      if (req.query) {
+        filter.$or = [
+          { status: req.query.status },
+          { createdBy: req.query.createdBy },
+        ];
       }
 
       // search
@@ -43,7 +43,7 @@ export const controller = {
       };
       if (req.query.keyword) {
         objectKeyword.keyword = req.query.keyword as string;
-        find.title = new RegExp(objectKeyword.keyword, 'i');
+        filter.title = new RegExp(objectKeyword.keyword, 'i');
       }
 
       // sort
@@ -55,7 +55,7 @@ export const controller = {
       }
 
       // pagination
-      const totalTasks = await Task.countDocuments(find);
+      const totalTasks = await Task.countDocuments(filter);
       const helperPagination = pagination(
         {
           page: 1,
@@ -65,7 +65,7 @@ export const controller = {
         req.query
       );
 
-      const tasks: any = await Task.find(find)
+      const tasks: any = await Task.find(filter)
         .lean()
         .sort(sort)
         .skip(helperPagination.skip)
@@ -83,7 +83,6 @@ export const controller = {
         success: true,
         data: tasks,
         pagination: helperPagination,
-        suggestions: tasks.map((task: any) => task.title),
       });
     } catch (error) {
       return res.status(500).json({
@@ -291,7 +290,6 @@ export const controller = {
       res.status(200).json({
         success: true,
         data: tasks,
-        suggestions: tasks.map((task: any) => task.title),
       });
     } catch (error) {
       return res.status(500).json({
