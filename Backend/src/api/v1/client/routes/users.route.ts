@@ -1,8 +1,17 @@
 import { Router } from 'express';
+import multer from 'multer';
 
+// controllers
 import { controller } from '../controllers/users.controller';
+
+// validators
 import { userValidator } from '../validators/user.validator';
+
+// Middlewares
 import { Auth } from '../middlewares/auth.middleware';
+import { uploadCloud } from '../middlewares/uploadCloud.middleware';
+
+const upload = multer();
 
 const router = Router();
 
@@ -40,7 +49,13 @@ router.post(
 router.get('/profile', Auth.requireAuth, controller.profile);
 
 // [PATCH] /api/v1/user/profile/edit
-router.patch('/profile/edit', Auth.requireAuth, controller.editProfile);
+router.patch(
+  '/profile/edit',
+  Auth.requireAuth,
+  upload.single('avatar'),
+  uploadCloud.upload as any,
+  controller.editProfile
+);
 
 // [GET] /api/v1/user/list
 router.get('/list', Auth.requireAuth, controller.list);
