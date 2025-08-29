@@ -20,12 +20,12 @@ export const Auth = {
         process.env.SECRET_KEY as string
       ) as any;
 
-      const user = await Account.findOne({
+      const account = await Account.findOne({
         _id: decoded.userId,
         status: 'active',
         deleted: false,
       }).select('-password');
-      if (!user) {
+      if (!account) {
         return res.status(403).json({
           success: false,
           message: 'Vui lòng đăng nhập',
@@ -33,7 +33,7 @@ export const Auth = {
       }
 
       const role = await Role.findOne({
-        _id: user.role_id,
+        _id: account.role_id,
       });
       if (!role) {
         return res.status(403).json({
@@ -43,7 +43,7 @@ export const Auth = {
       }
 
       req.role = role;
-      req.account = user;
+      req.account = account;
       next();
     } catch (err) {
       return res.status(500).json({
