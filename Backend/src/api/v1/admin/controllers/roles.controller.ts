@@ -79,9 +79,16 @@ export const controller = {
   // [PATCH] /admin/api/v1/roles/edit/:id
   edit: async (req: Request, res: Response) => {
     try {
+      const updatedBy = {
+        account_id: req.account?.id,
+        updatedAt: new Date(),
+      }
       const role = await Role.findOneAndUpdate(
         { _id: req.params.id },
-        req.body
+        {
+          ...req.body,
+          $push: { updatedBy: updatedBy },
+        }
       );
       res.status(200).json({
         success: true,

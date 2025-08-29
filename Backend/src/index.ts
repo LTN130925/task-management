@@ -17,6 +17,9 @@ connectDB();
 import routerApiClientVer1 from './api/v1/client/routes/index.route';
 import routerApiAdminVer1 from './api/v1/admin/routes/index.route';
 
+// cron
+import { cleanUpdatedByJob } from './cron/cleanUpdatedBy';
+
 // Initialize Express
 const app: Application = express();
 const port = process.env.PORT;
@@ -29,6 +32,9 @@ app.use(bodyParser.json());
 
 // cors
 app.use(cors());
+
+// cron
+cleanUpdatedByJob();
 
 // Routes
 // => v1
