@@ -2,7 +2,6 @@ import Account from '../../../../models/accounts.model';
 import Role from '../../../../models/roles.model';
 
 import { Response, Request } from 'express';
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
 // helpers
@@ -49,6 +48,7 @@ export const controller = {
       }
 
       const accounts: any = await Account.find(filter)
+        .select('-password')
         .lean()
         .sort(sort)
         .skip(helperPagination.skip)
@@ -95,26 +95,10 @@ export const controller = {
       const account = new Account(req.body);
       await account.save();
 
-      const payload: any = {
-        userId: account.id,
-        fullName: account.fullName,
-        status: account.status,
-      };
-
-      const accessToken = jwt.sign(payload, process.env.SECRET_KEY as string, {
-        expiresIn: '15m',
-      });
-      const refreshToken = jwt.sign(
-        payload,
-        process.env.REFRESH_SECRET as string,
-        { expiresIn: '7d' }
-      );
       res.status(201).json({
         success: true,
         message: 'Tài khoản đã được tạo',
         data: account,
-        accessToken,
-        refreshToken,
       });
     } catch (error) {
       res.status(500).json({
