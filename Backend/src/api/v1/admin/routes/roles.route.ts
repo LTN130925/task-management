@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 // validators
 import { createValidator } from '../validators/create.validator';
+import { editValidator } from '../validators/edit.validator';
 
 // controller
 import { controller } from '../controllers/roles.controller';
@@ -15,6 +16,6 @@ router.get('/', controller.index);
 router.post('/create', createValidator.create, controller.create);
 
 // [PATCH] /admin/api/v1/roles/edit/:id
-router.patch('/edit/:id', createValidator.create, controller.edit);
+router.patch('/edit/:id', editValidator.edit, controller.edit);
 
 export default router;

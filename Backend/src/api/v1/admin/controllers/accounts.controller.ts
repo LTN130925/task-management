@@ -58,8 +58,19 @@ export const controller = {
         const role = await Role.findOne({
           _id: account.role_id,
           deleted: false,
-        }).lean();
-        account.role = role?.title;
+        })
+          .lean()
+          .select('title');
+
+        const user = await Account.findOne({
+          _id: account.createdBy.account_id,
+          deleted: false,
+        })
+          .lean()
+          .select('fullName');
+
+        account.createdBy.accountFullName = user?.fullName;
+        account.roleName = role?.title;
       }
 
       res.status(200).json({
