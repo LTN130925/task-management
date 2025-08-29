@@ -48,8 +48,8 @@ router.patch(
 );
 
 //                    TRASH
-// [GET] /admin/api/v1/tasks/trash/index
-router.get(`${systemConfig.prefixTrash}/index`, controller.trash);
+// [GET] /admin/api/v1/tasks/trash
+router.get(`${systemConfig.prefixTrash}`, controller.trash);
 
 // [GET] /admin/api/v1/tasks/trash/detail/:id
 router.get(`${systemConfig.prefixTrash}/detail/:id`, controller.detailTrash);

@@ -2,11 +2,14 @@ import Account from '../../../../models/accounts.model';
 import Role from '../../../../models/roles.model';
 
 import { Response, Request } from 'express';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
 // helpers
 import { pagination } from '../../../../helpers/pagination';
 
 export const controller = {
+  // [GET] /admin/api/v1/accounts
   index: async (req: Request, res: Response) => {
     try {
       const filter: any = {
@@ -14,15 +17,14 @@ export const controller = {
         status: 'active',
       };
 
-      const { status, keyword } = req.query;
-
       // filter
-      if (status) {
+      if (req.query.status) {
         filter.status = req.query.status;
       }
 
       // search
-      if (keyword) {
+      if (req.query.keyword) {
+        const keyword = req.query.keyword;
         const regex = new RegExp(keyword as string, 'i');
         filter.$or = [{ fullName: regex }, { email: regex }, { phone: regex }];
       }
@@ -32,7 +34,7 @@ export const controller = {
       const helperPagination = pagination(
         {
           page: 1,
-          limit: 20,
+          limit: 4,
         },
         totalAccounts,
         req.query
@@ -57,7 +59,7 @@ export const controller = {
           _id: account.role_id,
           deleted: false,
         }).lean();
-        account.role = role?.name;
+        account.role = role?.title;
       }
 
       res.status(200).json({
@@ -67,6 +69,55 @@ export const controller = {
       });
     } catch (error) {
       return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [POST] /admin/api/v1/accounts/create
+  create: async (req: Request, res: Response) => {
+    try {
+      const user: any = await Account.findOne({
+        email: req.body.email,
+        deleted: false,
+      });
+
+      if (user) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email đã tồn tại, vui lòng nhập email khác!',
+        });
+      }
+      req.body.password = await bcrypt.hash(req.body.password, 10);
+      delete req.body.confirmPassword;
+
+      const account = new Account(req.body);
+      await account.save();
+
+      const payload: any = {
+        userId: account.id,
+        fullName: account.fullName,
+        status: account.status,
+      };
+
+      const accessToken = jwt.sign(payload, process.env.SECRET_KEY as string, {
+        expiresIn: '15m',
+      });
+      const refreshToken = jwt.sign(
+        payload,
+        process.env.REFRESH_SECRET as string,
+        { expiresIn: '7d' }
+      );
+      res.status(201).json({
+        success: true,
+        message: 'Tài khoản đã được tạo',
+        data: account,
+        accessToken,
+        refreshToken,
+      });
+    } catch (error) {
+      res.status(500).json({
         success: false,
         message: 'Lỗi server',
       });

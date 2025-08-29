@@ -1,10 +1,29 @@
 import { Router } from 'express';
+import multer from 'multer';
+
+// validators
+import { createValidator } from '../validators/create.validator';
 
 // controller
 import { controller } from '../controllers/accounts.controller';
 
+// middlewares
+import { uploadCloud } from '../../client/middlewares/uploadCloud.middleware';
+
+const upload = multer();
+
 const router = Router();
 
+// [GET] /admin/api/v1/accounts
 router.get('/', controller.index);
+
+// [POST] /admin/api/v1/accounts/create
+router.post(
+  '/create',
+  upload.single('avatar'),
+  createValidator.createAccount,
+  uploadCloud.upload as any,
+  controller.create
+);
 
 export default router;

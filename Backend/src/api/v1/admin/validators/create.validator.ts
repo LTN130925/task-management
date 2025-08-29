@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 
+// helpers
+import isValidPassword from '../../../../helpers/securePassword';
+
 // edit and create validators
 export const createValidator = {
   create: (req: Request, res: Response, next: NextFunction) => {
@@ -11,5 +14,46 @@ export const createValidator = {
     }
 
     next();
-  }
-}
+  },
+
+  createAccount: (req: Request, res: Response, next: NextFunction) => {
+    if (!req.body.fullName) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tên người dùng không tồn tại',
+      });
+    }
+    if (!req.body.email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email không tồn tại',
+      });
+    }
+    if (!req.body.password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mật khẩu không tồn tại',
+      });
+    }
+    if (!isValidPassword(req.body.password)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mật khẩu không hợp lệ',
+      });
+    }
+    if (!req.body.confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mật khẩu xác thực không tồn tại',
+      });
+    }
+    if (req.body.password !== req.body.confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mật khẩu không khớp',
+      });
+    }
+
+    next();
+  },
+};
