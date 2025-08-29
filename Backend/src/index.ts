@@ -18,7 +18,8 @@ import routerApiClientVer1 from './api/v1/client/routes/index.route';
 import routerApiAdminVer1 from './api/v1/admin/routes/index.route';
 
 // cron
-import { cleanUpdatedByJob } from './cron/cleanUpdatedBy';
+import { cleanUpdatedByJobAccount } from './cron/cleanUpdatedBy';
+import { cleanUpdatedByJobRole } from './cron/cleanUpdatedBy';
 
 // Initialize Express
 const app: Application = express();
@@ -34,7 +35,8 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // cron
-cleanUpdatedByJob();
+cleanUpdatedByJobAccount();
+cleanUpdatedByJobRole();
 
 // Routes
 // => v1
