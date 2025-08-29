@@ -43,7 +43,7 @@ export const controller = {
         .sort(sort)
         .skip(helperPagination.skip)
         .limit(helperPagination.limit);
-        
+
       res.status(200).json({
         success: true,
         data: roles,
@@ -59,9 +59,31 @@ export const controller = {
   // [POST] /admin/api/v1/roles/create
   create: async (req: Request, res: Response) => {
     try {
+      req.body.createdBy = {
+        account_id: req.account?.id,
+      };
       const role = new Role(req.body);
       await role.save();
       res.status(201).json({
+        success: true,
+        data: role,
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [PATCH] /admin/api/v1/roles/edit/:id
+  edit: async (req: Request, res: Response) => {
+    try {
+      const role = await Role.findOneAndUpdate(
+        { _id: req.params.id },
+        req.body
+      );
+      res.status(200).json({
         success: true,
         data: role,
       });

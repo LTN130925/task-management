@@ -92,6 +92,10 @@ export const controller = {
       req.body.password = await bcrypt.hash(req.body.password, 10);
       delete req.body.confirmPassword;
 
+      req.body.createdBy = {
+        account_id: req.account?.id,
+      };
+
       const account = new Account(req.body);
       await account.save();
 
