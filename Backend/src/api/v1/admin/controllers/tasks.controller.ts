@@ -6,7 +6,7 @@ import User from '../../../../models/users.model';
 
 // helpers
 import { pagination } from '../../../../helpers/pagination';
-import { getSubTask } from '../../../../helpers/categoryTaskChild';
+import { getSubTask } from '../../../../helpers/subTasks';
 
 export const controller = {
   // [GET] /admin/api/v1/dropdowns/users
