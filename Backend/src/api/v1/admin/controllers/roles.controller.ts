@@ -148,7 +148,17 @@ export const controller = {
           message: 'Không tìm thấy role',
         });
       }
-      await Role.updateOne({ _id: id }, { deleted: true });
+      const deletedBy = {
+        account_id: req.account?.id,
+        deletedAt: new Date(),
+      }
+      await Role.updateOne(
+        { _id: id },
+        {
+          deleted: true,
+          deletedBy: deletedBy,
+        }
+      );
       res.status(200).json({
         success: true,
         message: 'Xóa role thành công',
