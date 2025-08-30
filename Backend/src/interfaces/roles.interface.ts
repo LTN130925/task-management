@@ -14,7 +14,7 @@ export interface IRole extends mongoose.Document {
     title: string;
     updatedAt: Date;
   }[];
-  deletedBy?: {
+  deletedBy: {
     account_id: string;
     deletedAt: Date;
   };

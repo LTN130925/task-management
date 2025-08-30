@@ -171,29 +171,39 @@ export const controller = {
     }
   },
 
-  // // [DELETE] /admin/api/v1/accounts/delete/:id
-  // delete: async (req: Request, res: Response) => {
-  //   try {
-  //     const { id } = req.params;
-  //     const account = await Account.findOne({ _id: id, deleted: false });
-  //     if (!account) {
-  //       return res.status(404).json({
-  //         success: false,
-  //         message: 'Tài khoản không tìm thấy',
-  //       });
-  //     }
-  //     await Account.updateOne({ _id: id }, { deleted: true });
-  //     res.status(200).json({
-  //       success: true,
-  //       message: 'Tài khoản đã được xóa',
-  //     });
-  //   } catch (err) {
-  //     res.status(500).json({
-  //       success: false,
-  //       message: 'Lỗi server',
-  //     });
-  //   }
-  // },
+  // [DELETE] /admin/api/v1/accounts/delete/:id
+  delete: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const account = await Account.findOne({ _id: id, deleted: false });
+      if (!account) {
+        return res.status(404).json({
+          success: false,
+          message: 'Tài khoản không tìm thấy',
+        });
+      }
+      const deletedBy = {
+        account_id: req.account?.id,
+        deletedAt: new Date(),
+      };
+      await Account.updateOne(
+        { _id: id },
+        {
+          deleted: true,
+          deletedBy: deletedBy,
+        }
+      );
+      res.status(200).json({
+        success: true,
+        message: 'Tài khoản đã được xóa',
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 
   // [GET] /admin/api/v1/accounts/detail/:id
   detail: async (req: Request, res: Response) => {
