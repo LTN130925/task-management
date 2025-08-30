@@ -69,6 +69,17 @@ export const controller = {
           .lean()
           .select('fullName');
 
+        for (const updatedBy of account.updatedBy) {
+          const user = await Account.findOne({
+            _id: updatedBy.account_id,
+            deleted: false,
+          })
+            .lean()
+            .select('fullName');
+
+          updatedBy.accountFullName = user?.fullName;
+        }
+
         account.createdBy.accountFullName = user?.fullName;
         account.roleTitle = role?.title;
       }

@@ -48,6 +48,7 @@ export const controller = {
       for (const role of roles) {
         const account = await Account.findOne({
           _id: role.createdBy.account_id,
+          deleted: false,
         })
           .lean()
           .select('fullName');
@@ -55,6 +56,7 @@ export const controller = {
         for (const updatedBy of role.updatedBy) {
           const account = await Account.findOne({
             _id: updatedBy.account_id,
+            deleted: false,
           })
             .lean()
             .select('fullName');
