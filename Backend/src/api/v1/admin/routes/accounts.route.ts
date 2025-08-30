@@ -27,6 +27,7 @@ router.post(
   controller.create
 );
 
+// [PATCH] /admin/api/v1/accounts/edit/:id
 router.patch(
   '/edit/:id',
   upload.single('avatar'),
