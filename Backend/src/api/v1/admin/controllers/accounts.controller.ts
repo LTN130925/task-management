@@ -55,33 +55,34 @@ export const controller = {
         .limit(helperPagination.limit);
 
       for (const account of accounts) {
+        // tạo tên nhóm quyền
         const role = await Role.findOne({
           _id: account.role_id,
           deleted: false,
         })
           .lean()
           .select('title');
+        account.roleTitle = role?.title;
 
+        // tạo tên người tạo
         const user = await Account.findOne({
           _id: account.createdBy.account_id,
           deleted: false,
         })
           .lean()
           .select('fullName');
+        account.createdBy.accountFullName = user?.fullName;
 
-        for (const updatedBy of account.updatedBy) {
-          const user = await Account.findOne({
-            _id: updatedBy.account_id,
+        const lastUpdated = account.updatedBy[account.updatedBy.length - 1];
+        if (lastUpdated) {
+          const userUpdated = await Account.findOne({
+            _id: lastUpdated.account_id,
             deleted: false,
           })
             .lean()
             .select('fullName');
-
-          updatedBy.accountFullName = user?.fullName;
+          lastUpdated.accountFullName = userUpdated?.fullName;
         }
-
-        account.createdBy.accountFullName = user?.fullName;
-        account.roleTitle = role?.title;
       }
 
       res.status(200).json({

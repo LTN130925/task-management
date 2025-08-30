@@ -46,29 +46,32 @@ export const controller = {
         .limit(helperPagination.limit);
 
       for (const role of roles) {
+        // tạo tên người tạo
         const account = await Account.findOne({
           _id: role.createdBy.account_id,
           deleted: false,
         })
           .lean()
           .select('fullName');
+        role.createdBy.accountFullName = account?.fullName;
 
-        for (const updatedBy of role.updatedBy) {
-          const account = await Account.findOne({
-            _id: updatedBy.account_id,
+        // tạo tên người cập nhật
+        const lastUpdatedBy = role.updatedBy[role.updatedBy.length - 1];
+        if (lastUpdatedBy) {
+          const userUpdated = await Account.findOne({
+            _id: lastUpdatedBy.account_id,
             deleted: false,
           })
             .lean()
             .select('fullName');
-          updatedBy.accountFullName = account?.fullName;
+          lastUpdatedBy.accountFullName = userUpdated?.fullName;
         }
-
-        role.createdBy.accountFullName = account?.fullName;
       }
 
       res.status(200).json({
         success: true,
         data: roles,
+        pagination: helperPagination,
       });
     } catch (err) {
       res.status(500).json({
