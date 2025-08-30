@@ -147,6 +147,7 @@ export const controller = {
       }
       const updatedBy = {
         account_id: req.account?.id,
+        title: 'Cập nhật tài khoản',
         updatedAt: new Date(),
       };
 
@@ -168,4 +169,107 @@ export const controller = {
       });
     }
   },
+
+  // // [DELETE] /admin/api/v1/accounts/delete/:id
+  // delete: async (req: Request, res: Response) => {
+  //   try {
+  //     const { id } = req.params;
+  //     const account = await Account.findOne({ _id: id, deleted: false });
+  //     if (!account) {
+  //       return res.status(404).json({
+  //         success: false,
+  //         message: 'Tài khoản không tìm thấy',
+  //       });
+  //     }
+  //     await Account.updateOne({ _id: id }, { deleted: true });
+  //     res.status(200).json({
+  //       success: true,
+  //       message: 'Tài khoản đã được xóa',
+  //     });
+  //   } catch (err) {
+  //     res.status(500).json({
+  //       success: false,
+  //       message: 'Lỗi server',
+  //     });
+  //   }
+  // },
+
+  // [GET] /admin/api/v1/accounts/detail/:id
+  detail: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const account: any = await Account.findOne({
+        _id: id,
+        deleted: false,
+      })
+        .lean()
+        .select('-password');
+      if (!account) {
+        return res.status(404).json({
+          success: false,
+          message: 'Tài khoản không tìm thấy',
+        });
+      }
+
+      // tạo tên người tạo
+      const user = await Account.findOne({
+        _id: account.createdBy.account_id,
+        deleted: false,
+      }).lean();
+      account.createdBy.accountFullName = user?.fullName;
+
+      // tạo tên người cập nhật
+      for (const item of account.updatedBy) {
+        const user = await Account.findOne({
+          _id: item.account_id,
+          deleted: false,
+        }).lean();
+        item.accountFullName = user?.fullName;
+      }
+
+      const role = await Role.findOne({
+        _id: account.role_id,
+        deleted: false,
+      })
+        .lean()
+        .select('title permissions description');
+
+      // gộp nhóm quyền với mô tả
+      account.role = role;
+
+      res.status(200).json({
+        success: true,
+        data: account,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // // [PATCH] /admin/api/v1/accounts/change-status/:status/:id
+  // changeStatus: async (req: Request, res: Response) => {
+  //   try {
+  //     const { id, status } = req.params;
+  //     const account = await Account.findOne({ _id: id, deleted: false });
+  //     if (!account) {
+  //       return res.status(404).json({
+  //         success: false,
+  //         message: 'Tài khoản không tìm thấy',
+  //       });
+  //     }
+  //     await Account.updateOne({ _id: id }, { status: status });
+  //     res.status(200).json({
+  //       success: true,
+  //       message: 'Trạng thái đã được cập nhật',
+  //     });
+  //   } catch (err) {
+  //     res.status(500).json({
+  //       success: false,
+  //       message: 'Lỗi server',
+  //     });
+  //   }
+  // },
 };

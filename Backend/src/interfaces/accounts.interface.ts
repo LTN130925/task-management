@@ -16,6 +16,7 @@ export interface IAccount extends mongoose.Document {
   };
   updatedBy: {
     account_id: string;
+    title: string;
     updatedAt: Date;
   }[];
   deletedBy: {

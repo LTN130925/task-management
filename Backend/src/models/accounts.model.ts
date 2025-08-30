@@ -28,6 +28,7 @@ const accountSchema = new mongoose.Schema<IAccount>({
   updatedBy: [
     {
       account_id: String,
+      title: String,
       updatedAt: Date,
     },
   ],

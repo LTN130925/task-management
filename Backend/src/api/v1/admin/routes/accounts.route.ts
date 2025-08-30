@@ -36,4 +36,13 @@ router.patch(
   controller.edit
 );
 
+// [GET] /admin/api/v1/accounts/detail/:id
+router.get('/detail/:id', controller.detail);
+
+// // [PATCH] /admin/api/v1/accounts/change-status/:status/:id
+// router.patch('/change-status/:status/:id', controller.changeStatus);
+
+// // [DELETE] /admin/api/v1/accounts/delete/:id
+// router.delete('/delete/:id', controller.delete);
+
 export default router;

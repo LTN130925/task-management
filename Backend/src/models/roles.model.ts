@@ -23,6 +23,7 @@ const roleSchema = new mongoose.Schema<IRole>({
   updatedBy: [
     {
       account_id: String,
+      title: String,
       updatedAt: Date,
     },
   ],
