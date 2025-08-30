@@ -260,10 +260,7 @@ export const controller = {
           });
         // END TRASH
         default:
-          res.status(500).json({
-            success: false,
-            message: 'Lỗi server',
-          });
+          break;
       }
       const { ids, key, value } = req.body;
       await Task.updateMany(

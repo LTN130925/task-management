@@ -85,4 +85,25 @@ export const changeStatusValidator = {
 
     next();
   },
+
+  changeMultiAccount: (req: Request, res: Response, next: NextFunction) => {
+    const { ids, key, value } = req.body;
+    if (!ids || !Array.isArray(ids)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Danh sách account ID không tồn tại',
+      });
+    }
+    const validatorValues = ['active', 'inactive'];
+    if (key === 'status' && !validatorValues.includes(value)) {
+      return res.status(400).json({
+        success: false,
+        message: `Không tìm thấy trạng thái. Trạng thái hợp lý: ${validatorValues.join(
+          ', '
+        )}`,
+      });
+    }
+
+    next();
+  },
 };

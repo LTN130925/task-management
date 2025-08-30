@@ -260,7 +260,7 @@ export const controller = {
     }
   },
 
-  // [PATCH] /admin/api/v1/accounts/change-status/:id
+  // [DELETE] /admin/api/v1/accounts/change-status/:id
   changeStatus: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -287,6 +287,47 @@ export const controller = {
       res.status(200).json({
         success: true,
         message: 'Trạng thái đã được cập nhật',
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [PATCH] /admin/api/v1/accounts/change-multi
+  changeMulti: async (req: Request, res: Response) => {
+    try {
+      const { ids, key, value } = req.body;
+      let updateValue = {};
+      switch (key) {
+        case 'deleted':
+          updateValue = {
+            [key]: true,
+          };
+          break;
+        case 'status':
+          const updatedBy = {
+            account_id: req.account?.id,
+            title: 'Cập nhật trạng thái',
+            updatedAt: new Date(),
+          };
+          updateValue = {
+            [key]: value,
+            $push: { updatedBy: updatedBy },
+          };
+          break;
+        default:
+          break;
+      }
+      await Account.updateMany(
+        { _id: { $in: ids }, deleted: false },
+        updateValue
+      );
+      res.status(200).json({
+        success: true,
+        message: 'Cập nhật trạng thái thành công',
       });
     } catch (err) {
       res.status(500).json({

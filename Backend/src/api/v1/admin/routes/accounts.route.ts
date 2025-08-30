@@ -52,4 +52,11 @@ router.patch(
 // [DELETE] /admin/api/v1/accounts/delete/:id
 router.delete('/delete/:id', deleteValidator.delete, controller.delete);
 
+// [PATCH] /admin/api/v1/accounts/change-multi
+router.patch(
+  '/change-multi',
+  changeStatusValidator.changeMultiAccount,
+  controller.changeMulti
+);
+
 export default router;
