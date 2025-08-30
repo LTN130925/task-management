@@ -137,27 +137,27 @@ export const controller = {
     }
   },
 
-  // // [DELETE] /admin/api/v1/roles/delete/:id
-  // delete: async (req: Request, res: Response) => {
-  //   try {
-  //     const { id } = req.params;
-  //     const role = await Role.findOne({ _id: id, deleted: false });
-  //     if (!role) {
-  //       return res.status(404).json({
-  //         success: false,
-  //         message: 'Không tìm thấy role',
-  //       });
-  //     }
-  //     await Role.updateOne({ _id: id }, { deleted: true });
-  //     res.status(200).json({
-  //       success: true,
-  //       data: role,
-  //     });
-  //   } catch (err) {
-  //     res.status(500).json({
-  //       success: false,
-  //       message: 'Lỗi server',
-  //     });
-  //   }
-  // },
+  // [DELETE] /admin/api/v1/roles/delete/:id
+  delete: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const role = await Role.findOne({ _id: id, deleted: false });
+      if (!role) {
+        return res.status(404).json({
+          success: false,
+          message: 'Không tìm thấy role',
+        });
+      }
+      await Role.updateOne({ _id: id }, { deleted: true });
+      res.status(200).json({
+        success: true,
+        message: 'Xóa role thành công',
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 };

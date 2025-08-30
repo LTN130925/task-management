@@ -18,4 +18,7 @@ router.post('/create', createValidator.create, controller.create);
 // [PATCH] /admin/api/v1/roles/edit/:id
 router.patch('/edit/:id', editValidator.edit, controller.edit);
 
+// [DELETE] /admin/api/v1/roles/delete/:id
+router.delete('/delete/:id', controller.delete);
+
 export default router;
