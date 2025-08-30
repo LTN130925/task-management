@@ -48,7 +48,7 @@ export const controller = {
       }
 
       const accounts: any = await Account.find(filter)
-        .select('-password')
+        .select('-password -deletedBy')
         .lean()
         .sort(sort)
         .skip(helperPagination.skip)

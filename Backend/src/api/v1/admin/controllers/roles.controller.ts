@@ -17,12 +17,12 @@ export const controller = {
       // search
       if (req.query.keyword) {
         const regex = new RegExp(req.query.keyword as string, 'i');
-        filter.name = regex;
+        filter.title = regex;
       }
 
       // sort
       const sort: any = {
-        name: 'asc',
+        title: 'asc',
       };
       if (req.query.sort_key && req.query.sort_value) {
         sort[req.query.sort_key as string] = req.query.sort_value as string;
