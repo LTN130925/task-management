@@ -99,6 +99,13 @@ export const controller = {
         _id: req.params.id,
         deleted: false,
       }).lean();
+
+      if (!task) {
+        return res.status(404).json({
+          success: false,
+          message: 'Không tìm thấy task',
+        });
+      }
       res.status(200).json({
         success: true,
         data: task,
@@ -122,7 +129,7 @@ export const controller = {
       if (!task) {
         return res.status(404).json({
           success: false,
-          message: 'Task not found',
+          message: 'Không tìm thấy task',
         });
       }
 
@@ -161,6 +168,13 @@ export const controller = {
   edit: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+      const task = await Task.findOne({ _id: id, deleted: false });
+      if (!task) {
+        return res.status(404).json({
+          success: false,
+          message: 'Task không tìm thấy',
+        });
+      }
       await Task.updateOne({ _id: id }, req.body);
       res.status(200).json({
         success: true,
@@ -178,6 +192,13 @@ export const controller = {
   delete: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+      const task = await Task.findOne({ _id: id, deleted: false });
+      if (!task) {
+        return res.status(404).json({
+          success: false,
+          message: 'Task không tìm thấy',
+        });
+      }
       await Task.updateOne({ _id: id }, { deleted: true });
       res.status(200).json({
         success: true,
@@ -196,6 +217,13 @@ export const controller = {
     try {
       const { id } = req.params;
       const { status } = req.body;
+      const task = await Task.findOne({ _id: id, deleted: false });
+      if (!task) {
+        return res.status(404).json({
+          success: false,
+          message: 'Task không tìm thấy',
+        });
+      }
       await Task.updateOne({ _id: id }, { status: status });
       res.status(200).json({
         success: true,
@@ -306,6 +334,12 @@ export const controller = {
         _id: req.params.id,
         deleted: true,
       }).lean();
+      if (!task) {
+        return res.status(404).json({
+          success: false,
+          message: 'Task không tìm thấy',
+        });
+      }
       res.status(200).json({
         success: true,
         data: task,
@@ -322,6 +356,13 @@ export const controller = {
   deleteTrash: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+      const task = await Task.findOne({ _id: id, deleted: true });
+      if (!task) {
+        return res.status(404).json({
+          success: false,
+          message: 'Task không tìm thấy',
+        });
+      }
       await Task.deleteOne({ _id: id, deleted: true });
       res.status(200).json({
         success: true,
@@ -339,6 +380,13 @@ export const controller = {
   restore: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+      const task = await Task.findOne({ _id: id, deleted: true });
+      if (!task) {
+        return res.status(404).json({
+          success: false,
+          message: 'Task không tìm thấy',
+        });
+      }
       await Task.updateOne({ _id: id, deleted: true }, { deleted: false });
       res.status(200).json({
         success: true,

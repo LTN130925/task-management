@@ -3,6 +3,7 @@ import multer from 'multer';
 
 // validators
 import { createValidator } from '../validators/create.validator';
+import { editValidator } from '../validators/edit.validator';
 
 // controller
 import { controller } from '../controllers/accounts.controller';
@@ -24,6 +25,14 @@ router.post(
   createValidator.createAccount,
   uploadCloud.upload as any,
   controller.create
+);
+
+router.patch(
+  '/edit/:id',
+  upload.single('avatar'),
+  editValidator.editAccount,
+  uploadCloud.upload as any,
+  controller.edit
 );
 
 export default router;

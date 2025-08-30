@@ -70,7 +70,7 @@ export const controller = {
           .select('fullName');
 
         account.createdBy.accountFullName = user?.fullName;
-        account.roleName = role?.title;
+        account.roleTitle = role?.title;
       }
 
       res.status(200).json({
@@ -116,6 +116,41 @@ export const controller = {
         data: account,
       });
     } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [PATCH] /admin/api/v1/accounts/edit/:id
+  edit: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const account = await Account.findOne({ _id: id, deleted: false });
+      if (!account) {
+        return res.status(404).json({
+          success: false,
+          message: 'Tài khoản không tìm thấy',
+        });
+      }
+      const updatedBy = {
+        account_id: req.account?.id,
+        updatedAt: new Date(),
+      };
+
+      await Account.updateOne(
+        { _id: id },
+        {
+          ...req.body,
+          $push: { updatedBy: updatedBy },
+        }
+      );
+      res.status(200).json({
+        success: true,
+        message: 'Tài khoản đã được cập nhật',
+      });
+    } catch (err) {
       res.status(500).json({
         success: false,
         message: 'Lỗi server',

@@ -1,4 +1,5 @@
 import Role from '../../../../models/roles.model';
+import Account from '../../../../models/accounts.model';
 
 import { Request, Response } from 'express';
 
@@ -38,11 +39,30 @@ export const controller = {
         req.query
       );
 
-      const roles = await Role.find(filter)
+      const roles: any = await Role.find(filter)
         .lean()
         .sort(sort)
         .skip(helperPagination.skip)
         .limit(helperPagination.limit);
+
+      for (const role of roles) {
+        const account = await Account.findOne({
+          _id: role.createdBy.account_id,
+        })
+          .lean()
+          .select('fullName');
+
+        for (const updatedBy of role.updatedBy) {
+          const account = await Account.findOne({
+            _id: updatedBy.account_id,
+          })
+            .lean()
+            .select('fullName');
+          updatedBy.accountFullName = account?.fullName;
+        }
+
+        role.createdBy.accountFullName = account?.fullName;
+      }
 
       res.status(200).json({
         success: true,
@@ -79,12 +99,21 @@ export const controller = {
   // [PATCH] /admin/api/v1/roles/edit/:id
   edit: async (req: Request, res: Response) => {
     try {
+      const { id } = req.params;
+      const role = await Role.findOne({ _id: id, deleted: false });
+      if (!role) {
+        return res.status(404).json({
+          success: false,
+          message: 'Không tìm thấy role',
+        });
+      }
+
       const updatedBy = {
         account_id: req.account?.id,
         updatedAt: new Date(),
-      }
-      const role = await Role.findOneAndUpdate(
-        { _id: req.params.id },
+      };
+      await Role.updateOne(
+        { _id: id },
         {
           ...req.body,
           $push: { updatedBy: updatedBy },
