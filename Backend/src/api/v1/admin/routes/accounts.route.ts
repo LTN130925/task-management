@@ -4,6 +4,7 @@ import multer from 'multer';
 // validators
 import { createValidator } from '../validators/create.validator';
 import { editValidator } from '../validators/edit.validator';
+import { changeStatusValidator } from '../validators/change-status.validator';
 
 // controller
 import { controller } from '../controllers/accounts.controller';
@@ -39,8 +40,12 @@ router.patch(
 // [GET] /admin/api/v1/accounts/detail/:id
 router.get('/detail/:id', controller.detail);
 
-// // [PATCH] /admin/api/v1/accounts/change-status/:status/:id
-// router.patch('/change-status/:status/:id', controller.changeStatus);
+// // [PATCH] /admin/api/v1/accounts/change-status/:id
+router.patch(
+  '/change-status/:id/',
+  changeStatusValidator.changeStatusAccount,
+  controller.changeStatus
+);
 
 // // [DELETE] /admin/api/v1/accounts/delete/:id
 // router.delete('/delete/:id', controller.delete);

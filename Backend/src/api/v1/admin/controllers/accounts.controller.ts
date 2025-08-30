@@ -250,27 +250,28 @@ export const controller = {
     }
   },
 
-  // // [PATCH] /admin/api/v1/accounts/change-status/:status/:id
-  // changeStatus: async (req: Request, res: Response) => {
-  //   try {
-  //     const { id, status } = req.params;
-  //     const account = await Account.findOne({ _id: id, deleted: false });
-  //     if (!account) {
-  //       return res.status(404).json({
-  //         success: false,
-  //         message: 'Tài khoản không tìm thấy',
-  //       });
-  //     }
-  //     await Account.updateOne({ _id: id }, { status: status });
-  //     res.status(200).json({
-  //       success: true,
-  //       message: 'Trạng thái đã được cập nhật',
-  //     });
-  //   } catch (err) {
-  //     res.status(500).json({
-  //       success: false,
-  //       message: 'Lỗi server',
-  //     });
-  //   }
-  // },
+  // [PATCH] /admin/api/v1/accounts/change-status/:id
+  changeStatus: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      const account = await Account.findOne({ _id: id, deleted: false });
+      if (!account) {
+        return res.status(404).json({
+          success: false,
+          message: 'Tài khoản không tìm thấy',
+        });
+      }
+      await Account.updateOne({ _id: id }, { status: status });
+      res.status(200).json({
+        success: true,
+        message: 'Trạng thái đã được cập nhật',
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 };
