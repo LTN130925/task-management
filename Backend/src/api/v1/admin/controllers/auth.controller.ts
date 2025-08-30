@@ -10,8 +10,14 @@ export const controller = {
     try {
       const account: any = await Account.findOne({
         email: req.body.email,
-        deleted: false,
       });
+
+      if (account.deleted) {
+        return res.status(400).json({
+          success: false,
+          message: 'Tài khoản không tồn tại',
+        });
+      }
 
       if (!account) {
         return res.status(400).json({
