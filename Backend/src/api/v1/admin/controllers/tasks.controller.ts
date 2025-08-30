@@ -3,6 +3,7 @@ import { Response, Request } from 'express';
 // models
 import Task from '../../../../models/tasks.model';
 import User from '../../../../models/users.model';
+import Account from '../../../../models/accounts.model';
 
 // helpers
 import { pagination } from '../../../../helpers/pagination';
@@ -25,12 +26,19 @@ export const controller = {
   // [GET] /admin/api/v1/tasks
   index: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('tasks_view')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const filter: any = {
         deleted: false,
       };
 
       // filter by status, userCreatedBy
-      if (req.query) {
+      const { status, createdBy } = req.query;
+      if (status || createdBy) {
         filter.$or = [
           { status: req.query.status },
           { createdBy: req.query.createdBy },
@@ -59,7 +67,7 @@ export const controller = {
       const helperPagination = pagination(
         {
           page: 1,
-          limit: 20,
+          limit: 4,
         },
         totalTasks,
         req.query
@@ -75,13 +83,27 @@ export const controller = {
         const user = await User.findOne({
           _id: task.createdBy,
           deleted: false,
-        }).lean();
-        task.userCreatedBy = user?.fullName;
+        })
+          .lean()
+          .select('fullName');
+
+        if (user) {
+          task.userCreatedBy = user.fullName;
+        } else {
+          const account = await Account.findOne({
+            _id: task.createdBy,
+            deleted: false,
+          })
+            .lean()
+            .select('fullName');
+          task.userCreatedBy = account?.fullName;
+        }
       }
 
       res.status(200).json({
         success: true,
         data: tasks,
+        totalTasks: totalTasks,
         pagination: helperPagination,
       });
     } catch (error) {
@@ -95,6 +117,12 @@ export const controller = {
   // [GET] /admin/api/v1/tasks/detail/:id
   detail: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('tasks_view')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const task = await Task.findOne({
         _id: req.params.id,
         deleted: false,
@@ -121,6 +149,12 @@ export const controller = {
   // [GET] /admin/api/v1/tasks/detail/:id/subtasks
   subtasks: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('tasks_view')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const task: any = await Task.findOne({
         _id: req.params.id,
         deleted: false,
@@ -149,6 +183,13 @@ export const controller = {
   // [POST] /admin/api/v1/tasks/create
   create: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('tasks_create')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
+      req.body.createdBy = req.account?.id;
       const newTask = new Task(req.body);
       await newTask.save();
       res.status(201).json({
@@ -167,6 +208,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/tasks/edit/:id
   edit: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('tasks_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const task = await Task.findOne({ _id: id, deleted: false });
       if (!task) {
@@ -191,6 +238,12 @@ export const controller = {
   // [DELETE] /admin/api/v1/tasks/delete/:id
   delete: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('tasks_delete')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const task = await Task.findOne({ _id: id, deleted: false });
       if (!task) {
@@ -215,6 +268,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/tasks/change-status/:id
   changeStatus: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('tasks_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const { status } = req.body;
       const task = await Task.findOne({ _id: id, deleted: false });
@@ -241,6 +300,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/tasks/trash/change-multi
   changeMulti: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('tasks_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       switch (req.body.key) {
         case 'deleted':
           req.body.value = true;
@@ -286,6 +351,12 @@ export const controller = {
   // [GET] /admin/api/v1/tasks/trash/index
   trash: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('tasks_view')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const find: any = {
         deleted: true,
       };
@@ -327,6 +398,12 @@ export const controller = {
   // [GET] /admin/api/v1/tasks/trash/detail/:id
   detailTrash: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('tasks_view')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const task = await Task.findOne({
         _id: req.params.id,
         deleted: true,
@@ -352,6 +429,12 @@ export const controller = {
   // [DELETE] /admin/api/v1/tasks/trash/delete/:id
   deleteTrash: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('tasks_delete')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const task = await Task.findOne({ _id: id, deleted: true });
       if (!task) {
@@ -376,6 +459,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/tasks/trash/restore/:id
   restore: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('tasks_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const task = await Task.findOne({ _id: id, deleted: true });
       if (!task) {
