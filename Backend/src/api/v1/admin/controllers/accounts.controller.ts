@@ -262,7 +262,18 @@ export const controller = {
           message: 'Tài khoản không tìm thấy',
         });
       }
-      await Account.updateOne({ _id: id }, { status: status });
+      const updatedBy = {
+        account_id: req.account?.id,
+        title: 'thay đổi trạng tài khoản',
+        updatedAt: new Date(),
+      };
+      await Account.updateOne(
+        { _id: id },
+        {
+          status: status,
+          $push: { updatedBy: updatedBy },
+        }
+      );
       res.status(200).json({
         success: true,
         message: 'Trạng thái đã được cập nhật',
