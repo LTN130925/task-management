@@ -21,4 +21,7 @@ router.patch('/edit/:id', editValidator.edit, controller.edit);
 // [DELETE] /admin/api/v1/roles/delete/:id
 router.delete('/delete/:id', controller.delete);
 
+// [DELETE] /admin/api/v1/roles/delete-multiple
+router.delete('/delete-multiple', controller.deleteMultiple);
+
 export default router;
