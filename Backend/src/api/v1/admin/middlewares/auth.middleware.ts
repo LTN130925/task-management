@@ -15,25 +15,22 @@ export const Auth = {
         });
       }
 
-      const decoded = jwt.verify(
-        token,
-        process.env.SECRET_KEY as string,
-        (error, decoded) => {
-          if (error) {
-            return res.status(403).json({
-              success: false,
-              message: 'Vui lòng đăng nhập',
-            });
-          }
-          return decoded;
-        }
-      ) as any;
+      let decoded: any;
+      try {
+        decoded = jwt.verify(token, process.env.SECRET_KEY as string) as any;
+      } catch (err) {
+        return res.status(403).json({
+          success: false,
+          message: 'Vui lòng đăng nhập',
+        });
+      }
 
       const account = await Account.findOne({
         _id: decoded.userId,
         status: 'active',
         deleted: false,
-      }).select('-password');
+      }).select('-password -createdBy -updatedBy -deletedBy');
+
       if (!account) {
         return res.status(403).json({
           success: false,
@@ -55,7 +52,7 @@ export const Auth = {
       req.account = account;
       next();
     } catch (err) {
-      return res.status(500).json({
+      res.status(500).json({
         success: false,
         message: 'Lỗi server',
       });

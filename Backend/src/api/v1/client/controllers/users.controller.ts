@@ -26,31 +26,16 @@ export const controller = {
       req.body.password = hashedPassword;
       delete req.body.confirmPassword;
 
-      const user = new User(req.body);
-      await user.save();
-
-      const payload: any = {
-        userId: user.id,
-        fullName: user.fullName,
-        status: user.status,
+      const user: any = new User(req.body);
+      user.createdBy.user = {
+        user_id: user.id,
+        role: 'user',
       };
-
-      const accessToken = jwt.sign(payload, process.env.SECRET_KEY as string, {
-        expiresIn: '15m',
-      });
-      const refreshToken = jwt.sign(
-        payload,
-        process.env.REFRESH_SECRET as string,
-        {
-          expiresIn: '7d',
-        }
-      );
+      await user.save();
 
       res.status(201).json({
         success: true,
-        message: 'Đăng ký thành công',
-        accessToken,
-        refreshToken,
+        message: 'Đăng ký thành công, vui lòng đăng nhập',
       });
     } catch (err) {
       return res.status(500).json({
@@ -239,13 +224,12 @@ export const controller = {
       }
       const user = await User.findOne({
         email: result.email,
-        status: 'active',
         deleted: false,
       });
       if (!user) {
         return res.status(404).json({
           success: false,
-          message: 'Tài khoản người dùng đã bị khóa',
+          message: 'Người dùng không tồn tại',
         });
       }
       const payload: any = {

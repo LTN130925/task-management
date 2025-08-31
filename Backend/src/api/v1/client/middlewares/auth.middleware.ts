@@ -14,25 +14,21 @@ export const Auth = {
         });
       }
 
-      const decoded = jwt.verify(
-        token,
-        process.env.SECRET_KEY as string,
-        (error, decoded) => {
-          if (error) {
-            return res.status(403).json({
-              success: false,
-              message: 'Vui lòng đăng nhập',
-            });
-          }
-          return decoded;
-        }
-      ) as any;
-      
+      let decoded: any;
+      try {
+        decoded = jwt.verify(token, process.env.SECRET_KEY as string) as any;
+      } catch (err) {
+        return res.status(403).json({
+          success: false,
+          message: 'Vui lòng đăng nhập',
+        });
+      }
+
       const user = await User.findOne({
         _id: decoded.userId,
         status: 'active',
         deleted: false,
-      }).select('-password');
+      }).select('-password -createdBy -updatedBy -deletedBy');
       if (!user) {
         return res.status(403).json({
           success: false,
