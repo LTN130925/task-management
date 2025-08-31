@@ -10,6 +10,8 @@ import { uploadCloud } from '../../client/middlewares/uploadCloud.middleware';
 // validator
 import { createValidator } from '../validators/create.validator';
 import { editValidator } from '../validators/edit.validator';
+import { detailValidator } from '../validators/detail.validator';
+import { deleteValidator } from '../validators/delete.validator';
 
 const upload = multer();
 
@@ -19,7 +21,7 @@ const router = Router();
 router.get('/', controller.index);
 
 // [GET] /admin/api/v1/users/detail/:id
-router.get('/detail/:id', controller.detail);
+router.get('/detail/:id', detailValidator.detail, controller.detail);
 
 // [POST] /admin/api/v1/users/create
 router.post(
@@ -39,8 +41,8 @@ router.patch(
   controller.edit
 );
 
-// // [DELETE] /admin/api/v1/users/delete/:id
-// router.delete('/delete/:id', controller.delete);
+// [DELETE] /admin/api/v1/users/delete/:id
+router.delete('/delete/:id', deleteValidator.delete, controller.delete);
 
 // // [PATCH] /admin/api/v1/users/change-status/:id
 // router.patch('/change-status/:id', controller.changeStatus);

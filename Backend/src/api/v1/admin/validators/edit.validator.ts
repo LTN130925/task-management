@@ -15,6 +15,12 @@ export const editValidator = {
   },
 
   editAccount: (req: Request, res: Response, next: NextFunction) => {
+    if (!req.params.id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Account ID không tồn tại',
+      });
+    }
     if (!req.body.fullName) {
       return res.status(400).json({
         success: false,
