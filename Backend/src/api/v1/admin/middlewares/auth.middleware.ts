@@ -17,7 +17,16 @@ export const Auth = {
 
       const decoded = jwt.verify(
         token,
-        process.env.SECRET_KEY as string
+        process.env.SECRET_KEY as string,
+        (error, decoded) => {
+          if (error) {
+            return res.status(403).json({
+              success: false,
+              message: 'Vui lòng đăng nhập',
+            });
+          }
+          return decoded;
+        }
       ) as any;
 
       const account = await Account.findOne({
