@@ -9,7 +9,7 @@ import { uploadCloud } from '../../client/middlewares/uploadCloud.middleware';
 
 // validator
 import { createValidator } from '../validators/create.validator';
-// import { editValidator } from '../validators/edit.validator';
+import { editValidator } from '../validators/edit.validator';
 
 const upload = multer();
 
@@ -30,8 +30,14 @@ router.post(
   controller.create
 );
 
-// // [PATCH] /admin/api/v1/users/edit/:id
-// router.patch('/edit/:id', editValidator.editAccount, controller.edit);
+// [PATCH] /admin/api/v1/users/edit/:id
+router.patch(
+  '/edit/:id',
+  upload.single('avatar'),
+  editValidator.editAccount,
+  uploadCloud.upload as any,
+  controller.edit
+);
 
 // // [DELETE] /admin/api/v1/users/delete/:id
 // router.delete('/delete/:id', controller.delete);

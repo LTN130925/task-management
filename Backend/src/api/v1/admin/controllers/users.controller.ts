@@ -126,7 +126,7 @@ export const controller = {
       };
       delete req.body.confirmPassword;
       req.body.password = await bcrypt.hash(req.body.password, 10);
-      
+
       const user = new User(req.body);
       await user.save();
 
@@ -143,39 +143,41 @@ export const controller = {
   },
 
   // [PATCH] /admin/api/v1/users/edit/:id
-  // edit: async (req: Request, res: Response) => {
-  //   try {
-  //     const { id } = req.params;
-  //     const user = await User.findOne({
-  //       _id: id,
-  //       deleted: false,
-  //     });
-  //     if (!user) {
-  //       return res.status(404).json({
-  //         success: false,
-  //         message: 'Người dùng không tồn tại',
-  //       });
-  //     }
-  //     const updatedBy = {
-  //       title: 'cập nhật thông tin người dùng',
-  //       admin_id: req.user.id,
-  //     };
-  //     await User.updateOne(
-  //       { _id: id, deleted: false },
-  //       {
-  //         ...req.body,
-  //         $push: { updatedBy: updatedBy },
-  //       }
-  //     );
-  //     res.status(200).json({
-  //       success: true,
-  //       message: 'Cập nhật người dùng thành công',
-  //     });
-  //   } catch (err) {
-  //     res.status(500).json({
-  //       success: false,
-  //       message: 'Lỗi server',
-  //     });
-  //   }
-  // },
+  edit: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const user = await User.findOne({
+        _id: id,
+        deleted: false,
+      }).lean();
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'Người dùng không tồn tại',
+        });
+      }
+
+      const updatedBy = {
+        title: 'cập nhật thông tin người dùng',
+        admin_id: req.account?.id,
+        updatedAt: new Date(),
+      };
+      await User.updateOne(
+        { _id: id, deleted: false },
+        {
+          ...req.body,
+          $push: { updatedBy: updatedBy },
+        }
+      );
+      res.status(200).json({
+        success: true,
+        message: 'Cập nhật người dùng thành công',
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 };
