@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 
 // models
-import User from '../models/users.model';
 import Account from '../models/accounts.model';
 
 export const makeNameUserInfo = {
@@ -13,13 +12,17 @@ export const makeNameUserInfo = {
         deleted: false,
       })
         .lean()
-        .select('-fullName');
-      user.createdBy.fullName = userCreated.fullName;
+        .select('fullName');
+      user.createdBy.fullName = userCreated
+        ? userCreated.fullName
+        : 'không tìm thấy';
+    } else {
+      user.createdBy = 'chính chủ';
     }
   },
 
   getLastFullNameUpdated: async (user: any) => {
-    if (user.updatedBy.length > 0) {
+    if (user.updatedBy?.length > 0) {
       const lastUpdated = user.updatedBy[user.updatedBy.length - 1];
       if (lastUpdated) {
         const userUpdated: any = await Account.findOne({
@@ -27,22 +30,22 @@ export const makeNameUserInfo = {
           deleted: false,
         })
           .lean()
-          .select('-fullName');
-        lastUpdated.fullName = userUpdated.fullName;
+          .select('fullName');
+        lastUpdated.fullName = userUpdated ? userUpdated.fullName : 'không';
       }
     }
   },
 
   getAllFullNameUpdated: async (user: any) => {
-    if (user.updatedBy.length > 0) {
+    if (user.updatedBy?.length > 0) {
       for (const updatedBy of user.updatedBy) {
         const userUpdated: any = await Account.findOne({
           _id: updatedBy.admin_id,
           deleted: false,
         })
           .lean()
-          .select('-fullName');
-        updatedBy.fullName = userUpdated.fullName;
+          .select('fullName');
+        updatedBy.fullName = userUpdated ? userUpdated.fullName : 'không';
       }
     }
   },
