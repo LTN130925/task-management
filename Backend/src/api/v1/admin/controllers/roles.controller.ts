@@ -10,6 +10,12 @@ export const controller = {
   // [GET] /admin/api/v1/roles
   index: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('roles_view')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const filter: any = {
         deleted: false,
       };
@@ -84,6 +90,12 @@ export const controller = {
   // [POST] /admin/api/v1/roles/create
   create: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('roles_create')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       req.body.createdBy = {
         account_id: req.account?.id,
       };
@@ -104,6 +116,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/roles/edit/:id
   edit: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('roles_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const role = await Role.findOne({ _id: id, deleted: false });
       if (!role) {
@@ -140,6 +158,12 @@ export const controller = {
   // [DELETE] /admin/api/v1/roles/delete/:id
   delete: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('roles_delete')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const role = await Role.findOne({ _id: id, deleted: false });
       if (!role) {
@@ -174,6 +198,12 @@ export const controller = {
   // [DELETE] /admin/api/v1/roles/delete-multiple
   deleteMultiple: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('roles_delete')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { ids } = req.body;
       const deletedBy = {
         account_id: req.account?.id,
