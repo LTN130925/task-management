@@ -11,6 +11,12 @@ export const controller = {
   // [GET] /admin/api/v1/accounts
   index: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('accounts_view')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const filter: any = {
         deleted: false,
         status: 'active',
@@ -101,6 +107,12 @@ export const controller = {
   // [POST] /admin/api/v1/accounts/create
   create: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('accounts_create')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const user: any = await Account.findOne({
         email: req.body.email,
         deleted: false,
@@ -138,6 +150,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/accounts/edit/:id
   edit: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('accounts_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const account = await Account.findOne({ _id: id, deleted: false });
       if (!account) {
@@ -174,6 +192,12 @@ export const controller = {
   // [DELETE] /admin/api/v1/accounts/delete/:id
   delete: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('accounts_delete')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const account = await Account.findOne({ _id: id, deleted: false });
       if (!account) {
@@ -208,6 +232,12 @@ export const controller = {
   // [GET] /admin/api/v1/accounts/detail/:id
   detail: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('accounts_view')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const account: any = await Account.findOne({
         _id: id,
@@ -263,6 +293,12 @@ export const controller = {
   // [DELETE] /admin/api/v1/accounts/change-status/:id
   changeStatus: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('accounts_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const { status } = req.body;
       const account = await Account.findOne({ _id: id, deleted: false });
@@ -299,6 +335,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/accounts/change-multi
   changeMulti: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('accounts_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { ids, key, value } = req.body;
       let updateValue = {};
       switch (key) {
