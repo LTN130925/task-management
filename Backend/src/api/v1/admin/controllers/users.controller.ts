@@ -217,4 +217,43 @@ export const controller = {
       });
     }
   },
+
+  // [PATCH] /admin/api/v1/users/change-status/:id
+  changeStatus: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      const user = await User.findOne({
+        _id: id,
+        deleted: true,
+      });
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'Tài khoản không tìm thấy',
+        });
+      }
+      const updatedBy = {
+        title: 'cập nhật trạng thái người dùng',
+        admin_id: req.account?.id,
+        updatedAt: new Date(),
+      };
+      await User.updateOne(
+        { _id: id },
+        {
+          status: status,
+          $push: { updatedBy: updatedBy },
+        }
+      );
+      res.status(200).json({
+        success: true,
+        message: 'Cập nhật trạng thái người dùng thành công',
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 };
