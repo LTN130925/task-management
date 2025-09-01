@@ -361,8 +361,39 @@ export const controller = {
     }
   },
 
-  // // [PATCH] /admin/api/v1/users/trash/restore/:id
-  // restore: async (req: Request, res: Response) => {
+  // [PATCH] /admin/api/v1/users/trash/restore/:id
+  restore: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const user = await User.findOne({ _id: id, deleted: true });
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'Tài khoản không tìm thấy',
+        });
+      }
+      const updatedBy = {
+        title: 'khôi phục tài khoản người dùng',
+        admin_id: req.account?.id,
+        updatedAt: new Date(),
+      };
 
-  // }
+      await User.updateOne(
+        { _id: id },
+        {
+          deleted: false,
+          $push: { updatedBy: updatedBy },
+        }
+      );
+      res.status(200).json({
+        success: true,
+        message: 'Khôi phục tài khoản người dùng thành công',
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 };

@@ -13,7 +13,7 @@ import { editValidator } from '../validators/edit.validator';
 import { detailValidator } from '../validators/detail.validator';
 import { deleteValidator } from '../validators/delete.validator';
 import { changeStatusValidator } from '../validators/change-status.validator';
-// import { restoreValidator } from '../validators/restore.validator';
+import { restoreValidator } from '../validators/restore.validator';
 
 // config
 import systemConfig from '../../../../config/system';
@@ -82,11 +82,11 @@ router.delete(
   controller.deletePermanently
 );
 
-// // [PATCH] /admin/api/v1/users/trash/restore/:id
-// router.patch(
-//   '/trash/restore/:id',
-//   restoreValidator.restore,
-//   controller.restore
-// );
+// [PATCH] /admin/api/v1/users/trash/restore/:id
+router.patch(
+  '/trash/restore/:id',
+  restoreValidator.restore,
+  controller.restore
+);
 
 export default router;
