@@ -13,6 +13,12 @@ export const controller = {
   // [GET] /admin/api/v1/dropdowns/users
   dropdowns: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('users_view')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const users = await User.find({ deleted: false }).select('_id fullName');
       res.json(users);
     } catch (error) {

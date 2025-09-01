@@ -14,6 +14,12 @@ export const controller = {
   index: (route: string) => {
     return async (req: Request, res: Response) => {
       try {
+        if (!req.role.permissions.includes('users_view')) {
+          return res.status(403).json({
+            success: false,
+            message: 'Bạn không có quyền truy cập',
+          });
+        }
         const filter: any = {
           deleted: route === 'trash' ? true : false,
         };
@@ -86,6 +92,12 @@ export const controller = {
   detail: (route: string) => {
     return async (req: Request, res: Response) => {
       try {
+        if (!req.role.permissions.includes('users_view')) {
+          return res.status(403).json({
+            success: false,
+            message: 'Bạn không có quyền truy cập',
+          });
+        }
         const filter: any = {
           _id: req.params.id,
           deleted: route === 'trash' ? true : false,
@@ -121,6 +133,12 @@ export const controller = {
   // [POST] /admin/api/v1/users/create
   create: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('users_create')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const emailExits = await User.findOne({
         email: req.body.email,
         deleted: false,
@@ -156,6 +174,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/users/edit/:id
   edit: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('users_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const user = await User.findOne({
         _id: id,
@@ -195,6 +219,12 @@ export const controller = {
   // [DELETE] /admin/api/v1/users/delete/:id
   delete: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('users_delete')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const user = await User.findOne({
         _id: id,
@@ -232,6 +262,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/users/change-status/:id
   changeStatus: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('users_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const { status } = req.body;
       const user = await User.findOne({
@@ -272,6 +308,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/users/trash/change-multi
   changeMulti: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('users_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { ids, key, value } = req.body;
       let updatedBy: any;
       let updateValue: any;
@@ -339,6 +381,12 @@ export const controller = {
   // [DELETE] /admin/api/v1/users/trash/delete-permanently/:id
   deletePermanently: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('users_delete')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const user = await User.findOne({ _id: id, deleted: true });
       if (!user) {
@@ -364,6 +412,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/users/trash/restore/:id
   restore: async (req: Request, res: Response) => {
     try {
+      if (!req.role.permissions.includes('users_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const user = await User.findOne({ _id: id, deleted: true });
       if (!user) {
