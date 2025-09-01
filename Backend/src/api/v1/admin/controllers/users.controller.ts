@@ -82,6 +82,7 @@ export const controller = {
   },
 
   // [GET] /admin/api/v1/users/detail/:id
+  // [GET] /admin/api/v1/users/trash/detail/:id
   detail: (route: string) => {
     return async (req: Request, res: Response) => {
       try {
@@ -89,7 +90,6 @@ export const controller = {
           _id: req.params.id,
           deleted: route === 'trash' ? true : false,
         };
-
         const user: any = await User.findOne(filter)
           .lean()
           .select('-password -deletedBy');
@@ -347,6 +347,6 @@ export const controller = {
 
   // // [PATCH] /admin/api/v1/users/trash/restore/:id
   // restore: async (req: Request, res: Response) => {
-    
+
   // }
 };

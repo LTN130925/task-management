@@ -17,7 +17,9 @@ export const makeNameUserInfo = {
         ? userCreated.fullName
         : 'không tìm thấy';
     } else {
-      user.createdBy = 'chính chủ';
+      user.createdBy = {
+        fullName: 'chính chủ',
+      };
     }
   },
 

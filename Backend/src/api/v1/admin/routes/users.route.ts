@@ -26,7 +26,7 @@ const router = Router();
 router.get('/', controller.index('index'));
 
 // [GET] /admin/api/v1/users/detail/:id
-router.get('/detail/:id', detailValidator.detail, controller.detail);
+router.get('/detail/:id', detailValidator.detail, controller.detail('index'));
 
 // [POST] /admin/api/v1/users/create
 router.post(
@@ -69,7 +69,11 @@ router.patch(
 router.get(`${systemConfig.prefixTrash}`, controller.index('trash'));
 
 // [GET] /admin/api/v1/users/trash/detail/:id
-// router.get('/trash/detail/:id', detailValidator.detail, controller.detail);
+router.get(
+  `${systemConfig.prefixTrash}/detail/:id`,
+  detailValidator.detail,
+  controller.detail('trash')
+);
 
 // // [DELETE] /admin/api/v1/users/trash/delete-permanently/:id
 // router.delete(
