@@ -77,16 +77,23 @@ router.get(
 
 // [DELETE] /admin/api/v1/users/trash/delete-permanently/:id
 router.delete(
-  '/trash/delete-permanently/:id',
+  `${systemConfig.prefixTrash}/delete-permanently/:id`,
   deleteValidator.delete,
   controller.deletePermanently
 );
 
 // [PATCH] /admin/api/v1/users/trash/restore/:id
 router.patch(
-  '/trash/restore/:id',
+  `${systemConfig.prefixTrash}/restore/:id`,
   restoreValidator.restore,
   controller.restore
+);
+
+// [PATCH] /admin/api/v1/users/trash/change-multi
+router.patch(
+  `${systemConfig.prefixTrash}/change-multi`,
+  changeStatusValidator.changeMultiAccount('users'),
+  controller.changeMulti
 );
 
 export default router;

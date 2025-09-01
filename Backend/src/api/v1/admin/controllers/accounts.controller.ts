@@ -373,7 +373,7 @@ export const controller = {
       );
       res.status(200).json({
         success: true,
-        message: 'Cập nhật trạng thái thành công',
+        message: `Cập nhật ${ids.length} tài khoản thành công`,
       });
     } catch (err) {
       res.status(500).json({

@@ -316,7 +316,7 @@ export const controller = {
           });
           return res.status(200).json({
             success: true,
-            message: 'Task xóa vĩnh viễn thành công',
+            message: `Task xóa vĩnh viễn ${ids.length} thành công`,
           });
         // END TRASH
         default:
@@ -331,7 +331,7 @@ export const controller = {
       );
       return res.status(200).json({
         success: true,
-        message: 'Task cập nhật trạng thái thông',
+        message: `Task cập nhật trạng thái ${ids.length} thành công`,
       });
     } catch (err) {
       return res.status(500).json({
