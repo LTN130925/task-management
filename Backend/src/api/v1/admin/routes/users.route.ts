@@ -75,12 +75,12 @@ router.get(
   controller.detail('trash')
 );
 
-// // [DELETE] /admin/api/v1/users/trash/delete-permanently/:id
-// router.delete(
-//   '/trash/delete/:id',
-//   deleteValidator.delete,
-//   controller.deletePermanently
-// );
+// [DELETE] /admin/api/v1/users/trash/delete-permanently/:id
+router.delete(
+  '/trash/delete-permanently/:id',
+  deleteValidator.delete,
+  controller.deletePermanently
+);
 
 // // [PATCH] /admin/api/v1/users/trash/restore/:id
 // router.patch(

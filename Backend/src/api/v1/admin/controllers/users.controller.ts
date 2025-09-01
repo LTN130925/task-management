@@ -336,14 +336,30 @@ export const controller = {
   },
 
   //                        TRASH
-  // // [DELETE] /admin/api/v1/users/trash/delete-permanently/:id
-  // deletePermanently: async (req: Request, res: Response) => {
-  //   try {
+  // [DELETE] /admin/api/v1/users/trash/delete-permanently/:id
+  deletePermanently: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const user = await User.findOne({ _id: id, deleted: true });
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'Tài khoản không tìm thấy',
+        });
+      }
 
-  //   } catch (err) {
-
-  //   }
-  // },
+      await User.deleteOne({ _id: id });
+      res.status(200).json({
+        success: true,
+        message: 'Xóa vĩnh viễn người dùng thành công',
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 
   // // [PATCH] /admin/api/v1/users/trash/restore/:id
   // restore: async (req: Request, res: Response) => {

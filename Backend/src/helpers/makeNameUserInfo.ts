@@ -1,5 +1,3 @@
-import { Request, Response } from 'express';
-
 // models
 import Account from '../models/accounts.model';
 
