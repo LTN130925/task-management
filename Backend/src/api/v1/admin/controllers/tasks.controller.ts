@@ -24,119 +24,123 @@ export const controller = {
   },
 
   // [GET] /admin/api/v1/tasks
-  index: async (req: Request, res: Response) => {
-    try {
-      if (!req.role.permissions.includes('tasks_view')) {
-        return res.status(403).json({
+  index: (route: string) => {
+    return async (req: Request, res: Response) => {
+      try {
+        if (!req.role.permissions.includes('tasks_view')) {
+          return res.status(403).json({
+            success: false,
+            message: 'Bạn không có quyền truy cập',
+          });
+        }
+        const filter: any = {
+          deleted: route === 'trash' ? true : false,
+        };
+
+        // filter by status, userCreatedBy
+        const { status, createdBy } = req.query;
+        if (status || createdBy) {
+          filter.$or = [
+            { status: req.query.status },
+            { createdBy: req.query.createdBy },
+          ];
+        }
+
+        // search
+        const objectKeyword: any = {
+          keyword: '',
+        };
+        if (req.query.keyword) {
+          objectKeyword.keyword = req.query.keyword as string;
+          filter.title = new RegExp(objectKeyword.keyword, 'i');
+        }
+
+        // sort
+        const sort: any = {
+          title: 'desc',
+        };
+        if (req.query.sort_key && req.query.sort_value) {
+          sort[req.query.sort_key as string] = req.query.sort_value;
+        }
+
+        // pagination
+        const totalTasks = await Task.countDocuments(filter);
+        const helperPagination = pagination(
+          {
+            page: 1,
+            limit: 4,
+          },
+          totalTasks,
+          req.query
+        );
+
+        const tasks: any = await Task.find(filter)
+          .lean()
+          .sort(sort)
+          .skip(helperPagination.skip)
+          .limit(helperPagination.limit);
+
+        for (const task of tasks) {
+          const account = await Account.findOne({
+            _id: task.createdBy,
+            deleted: false,
+          })
+            .lean()
+            .select('fullName');
+          if (account) {
+            task.createdBy = account.fullName;
+          } else {
+            task.createdBy = 'người dùng tạo';
+          }
+        }
+
+        res.status(200).json({
+          success: true,
+          data: tasks,
+          totalTasks: totalTasks,
+          pagination: helperPagination,
+        });
+      } catch (error) {
+        return res.status(500).json({
           success: false,
-          message: 'Bạn không có quyền truy cập',
+          message: 'Lỗi server',
         });
       }
-      const filter: any = {
-        deleted: false,
-      };
-
-      // filter by status, userCreatedBy
-      const { status, createdBy } = req.query;
-      if (status || createdBy) {
-        filter.$or = [
-          { status: req.query.status },
-          { createdBy: req.query.createdBy },
-        ];
-      }
-
-      // search
-      const objectKeyword: any = {
-        keyword: '',
-      };
-      if (req.query.keyword) {
-        objectKeyword.keyword = req.query.keyword as string;
-        filter.title = new RegExp(objectKeyword.keyword, 'i');
-      }
-
-      // sort
-      const sort: any = {
-        title: 'desc',
-      };
-      if (req.query.sort_key && req.query.sort_value) {
-        sort[req.query.sort_key as string] = req.query.sort_value;
-      }
-
-      // pagination
-      const totalTasks = await Task.countDocuments(filter);
-      const helperPagination = pagination(
-        {
-          page: 1,
-          limit: 4,
-        },
-        totalTasks,
-        req.query
-      );
-
-      const tasks: any = await Task.find(filter)
-        .lean()
-        .sort(sort)
-        .skip(helperPagination.skip)
-        .limit(helperPagination.limit);
-
-      for (const task of tasks) {
-        const account = await Account.findOne({
-          _id: task.createdBy,
-          deleted: false,
-        })
-          .lean()
-          .select('fullName');
-        if (account) {
-          task.createdBy = account.fullName;
-        } else {
-          task.createdBy = 'người dùng tạo';
-        }
-      }
-
-      res.status(200).json({
-        success: true,
-        data: tasks,
-        totalTasks: totalTasks,
-        pagination: helperPagination,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: 'Lỗi server',
-      });
-    }
+    };
   },
 
   // [GET] /admin/api/v1/tasks/detail/:id
-  detail: async (req: Request, res: Response) => {
-    try {
-      if (!req.role.permissions.includes('tasks_view')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Bạn không có quyền truy cập',
-        });
-      }
-      const task = await Task.findOne({
-        _id: req.params.id,
-        deleted: false,
-      }).lean();
+  detail: (route: string) => {
+    return async (req: Request, res: Response) => {
+      try {
+        if (!req.role.permissions.includes('tasks_view')) {
+          return res.status(403).json({
+            success: false,
+            message: 'Bạn không có quyền truy cập',
+          });
+        }
+        const task = await Task.findOne({
+          _id: req.params.id,
+          deleted: route === 'trash' ? true : false,
+        }).lean();
 
-      if (!task) {
-        return res.status(404).json({
+        if (!task) {
+          return res.status(404).json({
+            success: false,
+            message: 'Không tìm thấy task',
+          });
+        }
+        res.status(200).json({
+          success: true,
+          data: task,
+        });
+      } catch (error) {
+        return res.status(500).json({
           success: false,
-          message: 'Không tìm thấy task',
+          message: 'Lỗi server',
         });
       }
-      res.status(200).json({
-        success: true,
-        data: task,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: 'Lỗi server',
-      });
-    }
+    };
   },
 
   // [GET] /admin/api/v1/tasks/detail/:id/subtasks
@@ -299,8 +303,12 @@ export const controller = {
           message: 'Bạn không có quyền truy cập',
         });
       }
-      switch (req.body.key) {
+      const { ids, key, value } = req.body;
+      switch (key) {
         // => TRASH
+        case 'restore':
+          req.body.key = 'deleted';
+          break;
         case 'deleted-permanently':
           await Task.deleteMany({
             _id: { $in: req.body.ids },
@@ -314,13 +322,12 @@ export const controller = {
         default:
           break;
       }
-      const { ids, key, value } = req.body;
       await Task.updateMany(
         {
           _id: { $in: ids },
-          deleted: req.body.key === 'restore' ? true : false,
+          deleted: key === 'restore' ? true : false,
         },
-        { [key === 'restore' ? 'deleted' : key]: value }
+        { [key]: value }
       );
       return res.status(200).json({
         success: true,
@@ -335,86 +342,9 @@ export const controller = {
   },
 
   //                                TRASH
-  // [GET] /admin/api/v1/tasks/trash/index
-  trash: async (req: Request, res: Response) => {
-    try {
-      if (!req.role.permissions.includes('tasks_view')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Bạn không có quyền truy cập',
-        });
-      }
-      const find: any = {
-        deleted: true,
-      };
 
-      // search
-      const objectKeyword: any = {
-        keyword: '',
-      };
-      if (req.query.keyword) {
-        objectKeyword.keyword = req.query.keyword as string;
-        find.title = new RegExp(objectKeyword.keyword, 'i');
-      }
-
-      // filter by createdBy
-      if (req.query.createdBy) {
-        find.createdBy = req.query.createdBy;
-      }
-
-      const tasks: any = await Task.find(find).lean();
-      for (const task of tasks) {
-        const user: any = await User.findOne({
-          _id: task.createdBy,
-        }).lean();
-        task.userCreatedBy = user?.fullName;
-      }
-
-      res.status(200).json({
-        success: true,
-        data: tasks,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: 'Lỗi server',
-      });
-    }
-  },
-
-  // [GET] /admin/api/v1/tasks/trash/detail/:id
-  detailTrash: async (req: Request, res: Response) => {
-    try {
-      if (!req.role.permissions.includes('tasks_view')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Bạn không có quyền truy cập',
-        });
-      }
-      const task = await Task.findOne({
-        _id: req.params.id,
-        deleted: true,
-      }).lean();
-      if (!task) {
-        return res.status(404).json({
-          success: false,
-          message: 'Task không tìm thấy',
-        });
-      }
-      res.status(200).json({
-        success: true,
-        data: task,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: 'Lỗi server',
-      });
-    }
-  },
-
-  // [DELETE] /admin/api/v1/tasks/trash/delete/:id
-  deleteTrash: async (req: Request, res: Response) => {
+  // [DELETE] /admin/api/v1/tasks/trash/delete-permanently/:id
+  deletePermanently: async (req: Request, res: Response) => {
     try {
       if (!req.role.permissions.includes('tasks_delete')) {
         return res.status(403).json({

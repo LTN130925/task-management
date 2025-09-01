@@ -10,101 +10,112 @@ import { makeNameUserInfo } from '../../../../helpers/makeNameUserInfo';
 
 export const controller = {
   // [GET] /admin/api/v1/users
-  index: async (req: Request, res: Response) => {
-    try {
-      const filter: any = {
-        deleted: false,
-      };
+  // [GET] /admin/api/v1/users/trash
+  index: (route: string) => {
+    return async (req: Request, res: Response) => {
+      try {
+        const filter: any = {
+          deleted: route === 'trash' ? true : false,
+        };
 
-      // filter
-      if (req.query.status) {
-        filter.status = req.query.status;
+        // filter
+        if (req.query.status) {
+          filter.status = req.query.status;
+        }
+
+        // search
+        if (req.query.keyword) {
+          const regex = new RegExp(req.query.keyword as string, 'i');
+          filter.$or = [
+            { fullName: regex },
+            { email: regex },
+            { phone: regex },
+          ];
+        }
+
+        // sort
+        const sort: any = {
+          fullName: 'asc',
+        };
+        if (req.query.sort_key && req.query.sort_value) {
+          sort[req.query.sort_key as string] = req.query.sort_value as string;
+        }
+
+        // pagination
+        const totalUsers = await User.countDocuments(filter);
+        const helperPagination = pagination(
+          {
+            page: 1,
+            limit: 4,
+          },
+          totalUsers,
+          req.query
+        );
+
+        const users: any = await User.find(filter)
+          .lean()
+          .sort(sort)
+          .skip(helperPagination.skip)
+          .limit(helperPagination.limit)
+          .select('-password -deletedBy');
+
+        for (const user of users) {
+          // created by
+          await makeNameUserInfo.getFullNameCreated(user);
+
+          // updated by
+          await makeNameUserInfo.getLastFullNameUpdated(user);
+        }
+
+        res.status(200).json({
+          success: true,
+          data: users,
+          pagination: helperPagination,
+        });
+      } catch (err) {
+        res.status(500).json({
+          success: false,
+          message: 'Lỗi server',
+        });
       }
+    };
+  },
 
-      // search
-      if (req.query.keyword) {
-        const regex = new RegExp(req.query.keyword as string, 'i');
-        filter.$or = [{ fullName: regex }, { email: regex }, { phone: regex }];
-      }
+  // [GET] /admin/api/v1/users/detail/:id
+  detail: (route: string) => {
+    return async (req: Request, res: Response) => {
+      try {
+        const filter: any = {
+          _id: req.params.id,
+          deleted: route === 'trash' ? true : false,
+        };
 
-      // sort
-      const sort: any = {
-        fullName: 'asc',
-      };
-      if (req.query.sort_key && req.query.sort_value) {
-        sort[req.query.sort_key as string] = req.query.sort_value as string;
-      }
-
-      // pagination
-      const totalUsers = await User.countDocuments(filter);
-      const helperPagination = pagination(
-        {
-          page: 1,
-          limit: 4,
-        },
-        totalUsers,
-        req.query
-      );
-
-      const users: any = await User.find(filter)
-        .lean()
-        .sort(sort)
-        .skip(helperPagination.skip)
-        .limit(helperPagination.limit)
-        .select('-password -deletedBy');
-
-      for (const user of users) {
+        const user: any = await User.findOne(filter)
+          .lean()
+          .select('-password -deletedBy');
+        if (!user) {
+          return res.status(404).json({
+            success: false,
+            message: 'Người dùng không tồn tại',
+          });
+        }
         // created by
         await makeNameUserInfo.getFullNameCreated(user);
 
         // updated by
-        await makeNameUserInfo.getLastFullNameUpdated(user);
-      }
+        await makeNameUserInfo.getAllFullNameUpdated(user);
 
-      res.status(200).json({
-        success: true,
-        data: users,
-        pagination: helperPagination,
-      });
-    } catch (err) {
-      res.status(500).json({
-        success: false,
-        message: 'Lỗi server',
-      });
-    }
-  },
-
-  // [GET] /admin/api/v1/users/detail/:id
-  detail: async (req: Request, res: Response) => {
-    try {
-      const user: any = await User.findOne({
-        _id: req.params.id,
-        deleted: false,
-      })
-        .lean()
-        .select('-password -deletedBy');
-      if (!user) {
-        return res.status(404).json({
+        res.status(200).json({
+          success: true,
+          data: user,
+        });
+      } catch (err) {
+        res.status(500).json({
           success: false,
-          message: 'Người dùng không tồn tại',
+          message: 'Lỗi server',
         });
       }
-      // created by
-      await makeNameUserInfo.getFullNameCreated(user);
-
-      // updated by
-      await makeNameUserInfo.getAllFullNameUpdated(user);
-
-      res.status(200).json({
-        success: true,
-        data: user,
-      });
-    } catch (err) {
-      res.status(500).json({
-        success: false,
-        message: 'Lỗi server',
-      });
-    }
+    };
   },
 
   // [POST] /admin/api/v1/users/create
@@ -258,10 +269,12 @@ export const controller = {
   },
 
   // [PATCH] /admin/api/v1/users/change-multi
+  // [PATCH] /admin/api/v1/users/trash/change-multi
   changeMulti: async (req: Request, res: Response) => {
     try {
       const { ids, key, value } = req.body;
-      let updateValue = {};
+      let updatedBy: any;
+      let updateValue: any;
       switch (key) {
         case 'deleted':
           updateValue = {
@@ -273,7 +286,7 @@ export const controller = {
           };
           break;
         case 'status':
-          const updatedBy = {
+          updatedBy = {
             title: 'cập nhật trạng thái người dùng',
             admin_id: req.account?.id,
             updatedAt: new Date(),
@@ -283,11 +296,31 @@ export const controller = {
             $push: { updatedBy: updatedBy },
           };
           break;
+        case 'restore':
+          updatedBy = {
+            title: 'khôi phục tài khoản người dùng',
+            admin_id: req.account?.id,
+            updatedAt: new Date(),
+          };
+          updateValue = {
+            deleted: value,
+            $push: { updatedBy: updatedBy },
+          };
+          break;
+        case 'delete-permanently':
+          await User.deleteMany({ _id: { $in: ids }, deleted: true });
+          return res.status(200).json({
+            success: true,
+            message: `Xóa vĩnh viễn ${ids.length} người dùng thành công`,
+          });
         default:
           break;
       }
       await User.updateMany(
-        { _id: { $in: ids }, deleted: false },
+        {
+          _id: { $in: ids },
+          deleted: req.body.key === 'restore' ? true : false,
+        },
         updateValue
       );
       res.status(200).json({
@@ -301,4 +334,19 @@ export const controller = {
       });
     }
   },
+
+  //                        TRASH
+  // // [DELETE] /admin/api/v1/users/trash/delete-permanently/:id
+  // deletePermanently: async (req: Request, res: Response) => {
+  //   try {
+
+  //   } catch (err) {
+
+  //   }
+  // },
+
+  // // [PATCH] /admin/api/v1/users/trash/restore/:id
+  // restore: async (req: Request, res: Response) => {
+    
+  // }
 };

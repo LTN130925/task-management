@@ -13,13 +13,17 @@ import { editValidator } from '../validators/edit.validator';
 import { detailValidator } from '../validators/detail.validator';
 import { deleteValidator } from '../validators/delete.validator';
 import { changeStatusValidator } from '../validators/change-status.validator';
+// import { restoreValidator } from '../validators/restore.validator';
+
+// config
+import systemConfig from '../../../../config/system';
 
 const upload = multer();
 
 const router = Router();
 
 // [GET] /admin/api/v1/users
-router.get('/', controller.index);
+router.get('/', controller.index('index'));
 
 // [GET] /admin/api/v1/users/detail/:id
 router.get('/detail/:id', detailValidator.detail, controller.detail);
@@ -55,25 +59,30 @@ router.patch(
 // [PATCH] /admin/api/v1/users/change-multi
 router.patch(
   '/change-multi',
-  changeStatusValidator.changeMultiAccount(''),
+  changeStatusValidator.changeMultiAccount('users'),
   controller.changeMulti
 );
 
 // //                    TRASH
 
-// // [GET] /admin/api/v1/users/trash
-// router.get('/trash', controller.trash);
+// [GET] /admin/api/v1/users/trash
+router.get(`${systemConfig.prefixTrash}`, controller.index('trash'));
 
-// // [GET] /admin/api/v1/users/trash/detail/:id
-// router.get('/trash/detail/:id', controller.detailTrash);
+// [GET] /admin/api/v1/users/trash/detail/:id
+// router.get('/trash/detail/:id', detailValidator.detail, controller.detail);
 
-// // [DELETE] /admin/api/v1/users/trash/delete/:id
-// router.delete('/trash/delete/:id', controller.deleteTrash);
+// // [DELETE] /admin/api/v1/users/trash/delete-permanently/:id
+// router.delete(
+//   '/trash/delete/:id',
+//   deleteValidator.delete,
+//   controller.deletePermanently
+// );
 
 // // [PATCH] /admin/api/v1/users/trash/restore/:id
-// router.patch('/trash/restore/:id', controller.restore);
-
-// // [PATCH] /admin/api/v1/users/trash/change-multi
-// router.patch('/trash/change-multi', controller.changeMultiTrash);
+// router.patch(
+//   '/trash/restore/:id',
+//   restoreValidator.restore,
+//   controller.restore
+// );
 
 export default router;
