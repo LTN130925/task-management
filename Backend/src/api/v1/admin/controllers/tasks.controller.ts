@@ -80,23 +80,16 @@ export const controller = {
         .limit(helperPagination.limit);
 
       for (const task of tasks) {
-        const user = await User.findOne({
+        const account = await Account.findOne({
           _id: task.createdBy,
           deleted: false,
         })
           .lean()
           .select('fullName');
-
-        if (user) {
-          task.userCreatedBy = user.fullName;
+        if (account) {
+          task.createdBy = account.fullName;
         } else {
-          const account = await Account.findOne({
-            _id: task.createdBy,
-            deleted: false,
-          })
-            .lean()
-            .select('fullName');
-          task.userCreatedBy = account?.fullName;
+          task.createdBy = 'người dùng tạo';
         }
       }
 
@@ -307,13 +300,7 @@ export const controller = {
         });
       }
       switch (req.body.key) {
-        case 'deleted':
-          req.body.value = true;
-          break;
         // => TRASH
-        case 'restore':
-          req.body.value = false;
-          break;
         case 'deleted-permanently':
           await Task.deleteMany({
             _id: { $in: req.body.ids },

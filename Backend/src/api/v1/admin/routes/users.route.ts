@@ -53,7 +53,11 @@ router.patch(
 );
 
 // [PATCH] /admin/api/v1/users/change-multi
-router.patch('/change-multi', controller.changeMulti);
+router.patch(
+  '/change-multi',
+  changeStatusValidator.changeMultiAccount(''),
+  controller.changeMulti
+);
 
 // //                    TRASH
 

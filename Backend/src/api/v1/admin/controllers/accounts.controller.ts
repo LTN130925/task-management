@@ -346,7 +346,7 @@ export const controller = {
       switch (key) {
         case 'deleted':
           updateValue = {
-            [key]: true,
+            [key]: value,
             deletedBy: {
               account_id: req.account?.id,
               deletedAt: new Date(),

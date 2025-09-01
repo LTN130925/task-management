@@ -55,7 +55,7 @@ router.delete('/delete/:id', deleteValidator.delete, controller.delete);
 // [PATCH] /admin/api/v1/accounts/change-multi
 router.patch(
   '/change-multi',
-  changeStatusValidator.changeMultiAccount,
+  changeStatusValidator.changeMultiAccount('accounts'),
   controller.changeMulti
 );
 

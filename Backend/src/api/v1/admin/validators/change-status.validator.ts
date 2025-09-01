@@ -1,5 +1,28 @@
 import { NextFunction, Request, Response } from 'express';
 
+const VALID_KEYS = [
+  'deleted',
+  'restore',
+  'status',
+  'deleted-permanently',
+] as const;
+
+const VALID_KEYS_ACCOUNTS = ['deleted', 'status'] as const;
+
+const VALID_VALUES_TASKS: Record<string, any[]> = {
+  status: ['initial', 'doing', 'finish', 'pending', 'notFinish'],
+  deleted: [true],
+  restore: [false],
+  'deleted-permanently': [true],
+};
+
+const VALID_VALUES: Record<string, any[]> = {
+  status: ['active', 'inactive'],
+  deleted: [true],
+  restore: [false],
+  'deleted-permanently': [true],
+};
+
 export const changeStatusValidator = {
   changeStatus: (req: Request, res: Response, next: NextFunction) => {
     if (!req.params.id) {
@@ -14,19 +37,10 @@ export const changeStatusValidator = {
         message: 'Trạng thái không tồn tại',
       });
     }
-    const validStatuses = [
-      'initial',
-      'doing',
-      'finish',
-      'pending',
-      'notFinish',
-    ];
-    if (!validStatuses.includes(req.body.status)) {
+    if (!VALID_VALUES_TASKS['status'].includes(req.body.status)) {
       return res.status(400).json({
         success: false,
-        message: `Không tìm thấy trạng thái. Trạng thái hợp lý: ${validStatuses.join(
-          ', '
-        )}`,
+        message: 'Không tìm thấy trạng thái hợp lí!',
       });
     }
 
@@ -41,19 +55,18 @@ export const changeStatusValidator = {
         message: 'Danh sách task ID không tồn tại',
       });
     }
-    const validatorValues = [
-      'initial',
-      'doing',
-      'finish',
-      'pending',
-      'notFinish',
-    ];
-    if (key === 'status' && !validatorValues.includes(value)) {
+
+    if (!VALID_KEYS.includes(key)) {
       return res.status(400).json({
         success: false,
-        message: `Không tìm thấy trạng thái. Trạng thái hợp lý: ${validatorValues.join(
-          ', '
-        )}`,
+        message: 'Không tìm thấy trạng thái hợp lí!',
+      });
+    }
+
+    if (!VALID_VALUES_TASKS[key].includes(value)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Không tìm thấy trạng thái hợp lí!',
       });
     }
 
@@ -70,40 +83,54 @@ export const changeStatusValidator = {
     if (!req.body.status) {
       return res.status(400).json({
         success: false,
-        message: 'Trạng thái không tồn tại',
+        message: 'Không tìm thấy trạng thái hợp lí!',
       });
     }
-    const validStatuses = ['active', 'inactive'];
-    if (!validStatuses.includes(req.body.status)) {
+    if (!VALID_VALUES['status'].includes(req.body.status)) {
       return res.status(400).json({
         success: false,
-        message: `Không tìm thấy trạng thái. Trạng thái hợp lý: ${validStatuses.join(
-          ', '
-        )}`,
+        message: 'Không tìm thấy trạng thái hợp lí!',
       });
     }
 
     next();
   },
 
-  changeMultiAccount: (req: Request, res: Response, next: NextFunction) => {
-    const { ids, key, value } = req.body;
-    if (!ids || !Array.isArray(ids)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Danh sách account ID không tồn tại',
-      });
-    }
-    const validatorValues = ['active', 'inactive'];
-    if (key === 'status' && !validatorValues.includes(value)) {
-      return res.status(400).json({
-        success: false,
-        message: `Không tìm thấy trạng thái. Trạng thái hợp lý: ${validatorValues.join(
-          ', '
-        )}`,
-      });
-    }
+  changeMultiAccount: (route: string) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+      const { ids, key, value } = req.body;
 
-    next();
+      if (!ids || !Array.isArray(ids)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Danh sách account ID không tồn tại',
+        });
+      }
+
+      if (route === 'accounts') {
+        if (!VALID_KEYS_ACCOUNTS.includes(key)) {
+          return res.status(400).json({
+            success: false,
+            message: 'Không tìm thấy trạng thái hợp lí!',
+          });
+        }
+      } else {
+        if (!VALID_KEYS.includes(key)) {
+          return res.status(400).json({
+            success: false,
+            message: 'Không tìm thấy trạng thái hợp lí!',
+          });
+        }
+      }
+
+      if (!VALID_VALUES[key].includes(value)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Không tìm thấy trạng thái hợp lí!',
+        });
+      }
+
+      next();
+    };
   },
 };
