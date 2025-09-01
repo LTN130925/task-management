@@ -52,8 +52,8 @@ router.patch(
   controller.changeStatus
 );
 
-// // [PATCH] /admin/api/v1/users/change-multi
-// router.patch('/change-multi', controller.changeMulti);
+// [PATCH] /admin/api/v1/users/change-multi
+router.patch('/change-multi', controller.changeMulti);
 
 // //                    TRASH
 

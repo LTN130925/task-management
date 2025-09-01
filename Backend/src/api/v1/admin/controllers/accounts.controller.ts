@@ -347,6 +347,10 @@ export const controller = {
         case 'deleted':
           updateValue = {
             [key]: true,
+            deletedBy: {
+              account_id: req.account?.id,
+              deletedAt: new Date(),
+            },
           };
           break;
         case 'status':

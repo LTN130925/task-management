@@ -256,4 +256,49 @@ export const controller = {
       });
     }
   },
+
+  // [PATCH] /admin/api/v1/users/change-multi
+  changeMulti: async (req: Request, res: Response) => {
+    try {
+      const { ids, key, value } = req.body;
+      let updateValue = {};
+      switch (key) {
+        case 'deleted':
+          updateValue = {
+            [key]: true,
+            deletedBy: {
+              admin_id: req.account?.id,
+              deletedAt: new Date(),
+            },
+          };
+          break;
+        case 'status':
+          const updatedBy = {
+            title: 'cập nhật trạng thái người dùng',
+            admin_id: req.account?.id,
+            updatedAt: new Date(),
+          };
+          updateValue = {
+            [key]: value,
+            $push: { updatedBy: updatedBy },
+          };
+          break;
+        default:
+          break;
+      }
+      await User.updateMany(
+        { _id: { $in: ids }, deleted: false },
+        updateValue
+      );
+      res.status(200).json({
+        success: true,
+        message: 'Cập nhật trạng thái thành công',
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 };
