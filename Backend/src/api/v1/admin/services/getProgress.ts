@@ -16,10 +16,16 @@ export interface IProgress {
   };
 }
 
-export const getProgress = async (condition?: any): Promise<IProgress[]> => {
+export const getProgress = async (
+  condition?: any,
+  sort?: any,
+  pagination?: any
+): Promise<IProgress[]> => {
   const tasks = await Task.find(condition || { deleted: false })
     .lean()
-    .sort(condition.sort || { createdAt: -1 });
+    .sort(sort || { createdAt: -1 })
+    .skip(pagination.skip || 0)
+    .limit(pagination.limit || 0);
   const stats: Record<string, IProgress> = {};
 
   for (const task of tasks) {

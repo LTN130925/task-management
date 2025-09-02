@@ -29,7 +29,9 @@ export const Auth = {
         _id: decoded.userId,
         status: 'active',
         deleted: false,
-      }).select('-password -createdBy -updatedBy -deletedBy');
+      })
+        .lean()
+        .select('-password -createdBy -updatedBy -deletedBy');
 
       if (!account) {
         return res.status(403).json({

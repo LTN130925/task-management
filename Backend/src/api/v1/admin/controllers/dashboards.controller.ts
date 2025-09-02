@@ -15,6 +15,7 @@ import { systemProgress } from '../services/systemProgress';
 import { pagination } from '../../../../helpers/pagination';
 
 export const controller = {
+  // [GET] /api/v1/admin/dashboards/dropdowns/users
   dropdownUsers: async (req: Request, res: Response) => {
     try {
       const users = await User.find({
@@ -99,8 +100,6 @@ export const controller = {
         sort[req.query.sort_key as string] = req.query.sort_value as string;
       }
 
-      condition.sort = sort;
-
       const totalTasks = await Task.countDocuments(condition);
       const helperPagination = pagination(
         {
@@ -111,7 +110,7 @@ export const controller = {
         req.query
       );
 
-      const progress = await getProgress(condition);
+      const progress = await getProgress(condition, sort, helperPagination);
       // => Make name user
       await makeNameUserInfo(progress);
 
