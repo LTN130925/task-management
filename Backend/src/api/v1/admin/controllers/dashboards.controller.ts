@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import { getProgress } from '../services/getProgress';
 import { makeNameUserInfo } from '../services/setNameProgress';
 import { getDeadline } from '../services/getDeadline';
+import { systemProgress } from '../services/systemProgress';
 
 export const controller = {
   // [GET] /api/v1/admin/dashboards/progress
@@ -28,6 +29,17 @@ export const controller = {
 
   // [GET] /api/v1/admin/dashboards/system
   system: async (req: Request, res: Response) => {
-    
+    try {
+      const system = await systemProgress();
+      return res.status(200).json({
+        success: true,
+        data: system,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
   },
 };
