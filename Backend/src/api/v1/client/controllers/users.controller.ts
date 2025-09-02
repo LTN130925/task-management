@@ -8,7 +8,7 @@ import ForgotPassword from '../../../../models/forgotPassword.model';
 
 // helpers
 import sendMail from '../../../../helpers/sendMail';
-import { generateRandom } from '../../../../helpers/generateRandom';
+import { generateRandom } from '../services/generateRandom';
 
 export const controller = {
   // [POST] /api/v1/user/register

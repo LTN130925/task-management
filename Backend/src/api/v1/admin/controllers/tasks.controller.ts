@@ -7,7 +7,7 @@ import Account from '../../../../models/accounts.model';
 
 // helpers
 import { pagination } from '../../../../helpers/pagination';
-import { getSubTask } from '../../../../helpers/subTasks';
+import { getSubTask } from '../services/subTasks';
 
 export const controller = {
   // [GET] /admin/api/v1/dropdowns/users

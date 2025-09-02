@@ -1,5 +1,5 @@
 // models
-import Account from '../models/accounts.model';
+import Account from '../../../../models/accounts.model';
 
 export const makeNameUserInfo = {
   getFullNameCreated: async (user: any) => {

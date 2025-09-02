@@ -1,14 +1,13 @@
 import { Request, Response } from 'express';
 
+import Task from '../../../../models/tasks.model';
+import User from '../../../../models/users.model';
+
 export const controller = {
-  index: (req: Request, res: Response) => {
-    res.status(200).json({
-      success: true,
-      message: 'Dashboard',
-      data: {
-        user: req.account,
-        role: req.role,
-      },
-    });
+  index: async (req: Request, res: Response) => {
+    try {
+      const tasks = await Task.find({ deleted: false }).lean();
+
+    } catch (error) {}
   },
 };
