@@ -48,7 +48,7 @@ export const controller = {
       };
 
       const accessToken = jwt.sign(payload, process.env.SECRET_KEY as string, {
-        expiresIn: '15m',
+        expiresIn: '1h',
       });
       const refreshToken = jwt.sign(
         payload,

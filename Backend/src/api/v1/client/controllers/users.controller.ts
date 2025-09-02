@@ -78,7 +78,7 @@ export const controller = {
       };
 
       const accessToken = jwt.sign(payload, process.env.SECRET_KEY as string, {
-        expiresIn: '15m',
+        expiresIn: '1h',
       });
       const refreshToken = jwt.sign(
         payload,
@@ -149,7 +149,7 @@ export const controller = {
       };
 
       const accessToken = jwt.sign(payload, process.env.SECRET_KEY as string, {
-        expiresIn: '15m',
+        expiresIn: '1h',
       });
       res.status(200).json({
         success: true,
@@ -238,7 +238,7 @@ export const controller = {
         status: user.status,
       };
       const accessToken = jwt.sign(payload, process.env.SECRET_KEY as string, {
-        expiresIn: '15m',
+        expiresIn: '1h',
       });
       const refreshToken = jwt.sign(
         payload,
