@@ -6,7 +6,7 @@ import User from '../../../../models/users.model';
 
 // helpers
 import { pagination } from '../../../../helpers/pagination';
-import { makeNameUserInfo } from '../services/makeNameUserInfo';
+import { makeNameUserInfo } from '../services/setNameUser';
 
 export const controller = {
   // [GET] /admin/api/v1/users

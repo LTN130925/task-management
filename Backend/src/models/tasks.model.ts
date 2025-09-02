@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 
-const taskSchema = new mongoose.Schema(
+import { ITask } from '../interfaces/tasks.interface';
+
+const taskSchema = new mongoose.Schema<ITask>(
   {
     title: String,
     status: {
@@ -12,7 +14,7 @@ const taskSchema = new mongoose.Schema(
     createdBy: String,
     taskParentId: String,
     listUsers: {
-      type: Array,
+      type: [String],
       default: [],
     },
     timeStart: Date,
@@ -28,6 +30,6 @@ const taskSchema = new mongoose.Schema(
   }
 );
 
-const Task = mongoose.model('Task', taskSchema, 'tasks');
+const Task = mongoose.model<ITask>('Task', taskSchema, 'tasks');
 
 export default Task;
