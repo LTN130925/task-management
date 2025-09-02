@@ -16,8 +16,8 @@ export interface IProgress {
   };
 }
 
-export const getProgress = async (): Promise<IProgress[]> => {
-  const tasks = await Task.find({ deleted: false }).lean();
+export const getProgress = async (condition: any): Promise<IProgress[]> => {
+  const tasks = await Task.find(condition).lean();
   const stats: Record<string, IProgress> = {};
 
   for (const task of tasks) {

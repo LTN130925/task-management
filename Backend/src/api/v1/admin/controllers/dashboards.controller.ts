@@ -10,7 +10,24 @@ export const controller = {
   // [GET] /api/v1/admin/dashboards/progress
   progress: async (req: Request, res: Response) => {
     try {
-      const progress = await getProgress();
+      const { status, userId, from, to } = req.query;
+
+      const condition: any = {
+        deleted: false,
+      };
+      if (status) {
+        condition.status = status;
+      }
+      if (userId) {
+        condition.createdBy = userId;
+      }
+      if (from && to) {
+        condition.timeFinish = {
+          $gte: from,
+          $lte: to,
+        };
+      }
+      const progress = await getProgress(condition);
       await makeNameUserInfo(progress);
       const deadline = await getDeadline();
 
