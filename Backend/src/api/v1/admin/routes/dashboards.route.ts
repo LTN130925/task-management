@@ -5,7 +5,10 @@ import { controller } from '../controllers/dashboards.controller';
 
 const router = Router();
 
-// [GET] /admin/api/v1/dashboard
-router.get('/', controller.index);
+// [GET] /admin/api/v1/dashboard/progress
+router.get('/', controller.progress);
+
+// [GET] /admin/api/v1/dashboard/system
+router.get('/progress', controller.system);
 
 export default router;
