@@ -4,6 +4,7 @@ export interface ITask extends mongoose.Document {
   title: string;
   status: string;
   content: string;
+  projectId: string;
   createdBy: string;
   taskParentId: string;
   listUsers: string[];

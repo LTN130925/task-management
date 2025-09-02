@@ -12,6 +12,7 @@ const taskSchema = new mongoose.Schema<ITask>(
     },
     content: String,
     createdBy: String,
+    projectId: String,
     taskParentId: String,
     listUsers: {
       type: [String],
