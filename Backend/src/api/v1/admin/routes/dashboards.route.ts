@@ -6,10 +6,7 @@ import { controller } from '../controllers/dashboards.controller';
 const router = Router();
 
 // [GET] /admin/api/v1/dashboard/dropdowns/users
-router.get('/', controller.dropdownUsers);
-
-// [GET] /admin/api/v1/dashboard/dropdowns/accounts
-router.get('/', controller.dropdownAccounts);
+router.get('/', controller.dropdown);
 
 // [GET] /admin/api/v1/dashboard/progress
 router.get('/progress', controller.progress);

@@ -19,6 +19,9 @@ const router = Router();
 // [GET] /admin/api/v1/dropdowns/users
 router.get('/dropdowns/users', controller.dropdowns);
 
+// [GET] /admin/api/v1/dropdowns/projects
+router.get('/dropdowns/projects', controller.dropdowns);
+
 // [GET] /admin/api/v1/tasks
 router.get('/', controller.index('index'));
 

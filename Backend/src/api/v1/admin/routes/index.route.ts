@@ -8,6 +8,7 @@ import roleRoutes from './roles.route';
 import authRoutes from './auth.route';
 import userRoutes from './users.route';
 import profileRoutes from './profile.route';
+import projectRoutes from './projects.route';
 
 // Config
 import systemConfig from '../../../../config/system';
@@ -29,6 +30,8 @@ export default (app: Application) => {
   app.use(`${version}/users`, Auth.requireAuth, userRoutes);
 
   app.use(`${version}/profile`, Auth.requireAuth, profileRoutes);
+
+  app.use(`${version}/projects`, Auth.requireAuth, projectRoutes);
 
   app.use(`${version}/auth`, authRoutes);
 };

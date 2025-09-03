@@ -23,6 +23,27 @@ export const createValidator = {
     next();
   },
 
+  createdProject: (req: Request, res: Response, next: NextFunction) => {
+    if (!req.body.title) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tiêu đề không tồn tại',
+      });
+    }
+
+    if (
+      req.body.status &&
+      !['active', 'completed', 'archived', 'inactive'].includes(req.body.status)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Trạng thái không hợp lệ',
+      });
+    }
+
+    next();
+  },
+
   createAccount: (req: Request, res: Response, next: NextFunction) => {
     if (!req.body.fullName) {
       return res.status(400).json({

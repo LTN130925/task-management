@@ -4,6 +4,7 @@ import { Response, Request } from 'express';
 import Task from '../../../../models/tasks.model';
 import User from '../../../../models/users.model';
 import Account from '../../../../models/accounts.model';
+import Project from '../../../../models/projects.model';
 
 // helpers
 import { pagination } from '../../../../helpers/pagination';
@@ -12,6 +13,7 @@ import { getSubTask } from '../../../../helpers/subTasks';
 export const controller = {
   // [GET] /admin/api/v1/dropdowns/users
   dropdowns: async (req: Request, res: Response) => {
+    // dùng làm bảng chọn người dùng lọc thông tin người dùng req.query bên dưới task index
     try {
       if (!req.role.permissions.includes('users_view')) {
         return res.status(403).json({
@@ -19,8 +21,20 @@ export const controller = {
           message: 'Bạn không có quyền truy cập',
         });
       }
-      const users = await User.find({ deleted: false }).select('_id fullName');
-      res.json(users);
+      const users = await User.find({ deleted: false, status: 'active' })
+        .lean()
+        .select('_id fullName');
+      const projects = await Project.find({ deleted: false, status: 'active' })
+        .lean()
+        .select('_id title');
+
+      res.json({
+        success: true,
+        data: {
+          users,
+          projects,
+        },
+      });
     } catch (error) {
       return res.status(500).json({
         success: false,
@@ -43,22 +57,26 @@ export const controller = {
           deleted: route === 'trash' ? true : false,
         };
 
-        // filter by status, userCreatedBy
-        const { status, createdBy } = req.query;
-        if (status || createdBy) {
+        // filter by status, userCreatedBy, projectId, deadline
+        const { status, createdBy, projectId, from, to } = req.query;
+        if (status || createdBy || projectId || (from && to)) {
           filter.$or = [
-            { status: req.query.status },
-            { createdBy: req.query.createdBy },
+            { status: status },
+            { createdBy: createdBy },
+            { projectId: projectId },
+            {
+              timeFinish: {
+                $gte: from,
+                $lte: to,
+              },
+            },
           ];
         }
 
         // search
-        const objectKeyword: any = {
-          keyword: '',
-        };
         if (req.query.keyword) {
-          objectKeyword.keyword = req.query.keyword as string;
-          filter.title = new RegExp(objectKeyword.keyword, 'i');
+          const regex = new RegExp(req.query.keyword as string, 'i');
+          filter.$or = [{ title: regex }, { content: regex }];
         }
 
         // sort
@@ -195,7 +213,7 @@ export const controller = {
       req.body.createdBy = req.account._id;
       const newTask = new Task(req.body);
       await newTask.save();
-      
+
       res.status(201).json({
         success: true,
         message: 'Task tạo thành công',

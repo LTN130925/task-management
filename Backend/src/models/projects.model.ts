@@ -2,19 +2,19 @@ import mongoose from 'mongoose';
 
 const projectSchema = new mongoose.Schema(
   {
-    fullName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    title: String,
     description: String,
     deadline: {
       type: Date,
-      required: false,
+      default: () => {
+        const date = new Date();
+        date.setDate(date.getDate() + 30);
+        return date;
+      }, // 1 month
     },
     status: {
       type: String,
-      enum: ['active', 'completed', 'archived'],
+      enum: ['active', 'completed', 'archived', 'inactive'],
       default: 'active',
     },
     members: {
@@ -23,23 +23,19 @@ const projectSchema = new mongoose.Schema(
     },
     createdBy: {
       createdById: String,
-      role: String,
       createdAt: {
         type: Date,
         default: Date.now,
       },
-      required: true,
     },
     updatedBy: [
       {
         updatedById: String,
-        role: String,
         updatedAt: Date,
       },
     ],
     deletedBy: {
       deletedById: String,
-      role: String,
       deletedAt: Date,
     },
     deleted: {
@@ -53,4 +49,5 @@ const projectSchema = new mongoose.Schema(
 );
 
 const Project = mongoose.model('Project', projectSchema, 'projects');
+
 export default Project;

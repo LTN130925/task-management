@@ -15,8 +15,9 @@ import { systemProgress } from '../services/systemProgress';
 import { pagination } from '../../../../helpers/pagination';
 
 export const controller = {
-  // [GET] /api/v1/admin/dashboards/dropdowns/users
-  dropdownUsers: async (req: Request, res: Response) => {
+  // [GET] /api/v1/admin/dashboards/dropdowns
+  dropdown: async (req: Request, res: Response) => {
+    // dùng làm bảng chọn người dùng lọc thông tin người dùng req.query bên dưới progress dashboard
     try {
       const users = await User.find({
         status: 'active',
@@ -24,30 +25,19 @@ export const controller = {
       })
         .lean()
         .select('_id fullName');
-      return res.status(200).json({
-        success: true,
-        data: users,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: 'Lỗi server',
-      });
-    }
-  },
-
-  // [GET] /api/v1/admin/dashboards/dropdowns/accounts
-  dropdownAccounts: async (req: Request, res: Response) => {
-    try {
       const accounts = await Account.find({
         status: 'active',
         deleted: false,
       })
         .lean()
         .select('_id fullName');
+
       return res.status(200).json({
         success: true,
-        data: accounts,
+        data: {
+          users,
+          accounts,
+        },
       });
     } catch (error) {
       return res.status(500).json({
@@ -66,22 +56,13 @@ export const controller = {
         deleted: false,
       };
 
-      // Filter by status
-      if (status) {
-        condition.status = status;
-      }
-
-      // Filter by user
-      if (userId) {
-        condition.createdBy = userId;
-      }
-
-      // Filter by deadline
-      if (from && to) {
-        condition.timeFinish = {
-          $gte: from,
-          $lte: to,
-        };
+      // Filter by status, user, deadline
+      if (status || userId || (from && to)) {
+        condition.$or = [
+          { status: status },
+          { createdBy: userId },
+          { timeFinish: { $gte: from, $lte: to } },
+        ];
       }
 
       // Filter by keyword
