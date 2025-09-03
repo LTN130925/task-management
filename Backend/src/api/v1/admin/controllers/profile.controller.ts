@@ -33,6 +33,7 @@ export const controller = {
           $push: { updatedBy: updatedBy },
         }
       );
+      
       res.status(200).json({
         success: true,
         data: req.account,
