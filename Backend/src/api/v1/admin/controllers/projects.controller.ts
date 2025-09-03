@@ -121,38 +121,38 @@ export const controller = {
   },
 
   // [GET] /admin/api/v1/projects/detail/:id
-  detail: (route: string) => {
-    return async (req: Request, res: Response) => {
-      try {
-        if (!req.role.permissions.includes('projects_view')) {
-          return res.status(403).json({
-            success: false,
-            message: 'Bạn không có quyền truy cập',
-          });
-        }
-        const project = await Project.findOne({
-          _id: req.params.id,
-          deleted: route === 'trash' ? true : false,
-        }).lean();
+  // detail: (route: string) => {
+  //   return async (req: Request, res: Response) => {
+  //     try {
+  //       if (!req.role.permissions.includes('projects_view')) {
+  //         return res.status(403).json({
+  //           success: false,
+  //           message: 'Bạn không có quyền truy cập',
+  //         });
+  //       }
+  //       const project = await Project.findOne({
+  //         _id: req.params.id,
+  //         deleted: route === 'trash' ? true : false,
+  //       }).lean();
 
-        if (!project) {
-          return res.status(404).json({
-            success: false,
-            message: 'Không tìm thấy project',
-          });
-        }
-        res.status(200).json({
-          success: true,
-          data: project,
-        });
-      } catch (error) {
-        return res.status(500).json({
-          success: false,
-          message: 'Lỗi server',
-        });
-      }
-    };
-  },
+  //       if (!project) {
+  //         return res.status(404).json({
+  //           success: false,
+  //           message: 'Không tìm thấy project',
+  //         });
+  //       }
+  //       res.status(200).json({
+  //         success: true,
+  //         data: project,
+  //       });
+  //     } catch (error) {
+  //       return res.status(500).json({
+  //         success: false,
+  //         message: 'Lỗi server',
+  //       });
+  //     }
+  //   };
+  // },
 
   // [POST] /admin/api/v1/projects/create
   create: async (req: Request, res: Response) => {
@@ -205,7 +205,7 @@ export const controller = {
       }
       const updatedBy = {
         updatedById: req.account._id,
-        title: 'Cập nhật trạng thái dự án',
+        title: 'Cập nhật thông tin dự án',
         updatedAt: Date.now(),
       };
       await Project.updateOne(
@@ -227,35 +227,49 @@ export const controller = {
     }
   },
 
-  //   // [DELETE] /admin/api/v1/projects/delete/:id
-  //   delete: async (req: Request, res: Response) => {
-  //     try {
-  //       if (!req.role.permissions.includes('projects_delete')) {
-  //         return res.status(403).json({
-  //           success: false,
-  //           message: 'Bạn không có quyền truy cập',
-  //         });
-  //       }
-  //       const { id } = req.params;
-  //       const task = await Project.findOne({ _id: id, deleted: false });
-  //       if (!task) {
-  //         return res.status(404).json({
-  //           success: false,
-  //           message: 'Task không tìm thấy',
-  //         });
-  //       }
-  //       await Task.updateOne({ _id: id }, { deleted: true });
-  //       res.status(200).json({
-  //         success: true,
-  //         message: 'Task xóa thành công',
-  //       });
-  //     } catch (err) {
-  //       return res.status(500).json({
-  //         success: false,
-  //         message: 'Lỗi server',
-  //       });
-  //     }
-  //   },
+  // [DELETE] /admin/api/v1/projects/delete/:id
+  delete: async (req: Request, res: Response) => {
+    try {
+      // if (!req.role.permissions.includes('projects_delete')) {
+      //   return res.status(403).json({
+      //     success: false,
+      //     message: 'Bạn không có quyền truy cập',
+      //   });
+      // }
+      const { id } = req.params;
+      const project = await Project.findOne({
+        _id: id,
+        deleted: false,
+      });
+      if (!project) {
+        return res.status(404).json({
+          success: false,
+          message: 'Dự án không tìm thấy',
+        });
+      }
+
+      const deletedBy = {
+        deletedById: req.account._id,
+        deletedAt: Date.now(),
+      };
+      await Project.updateOne(
+        { _id: id },
+        {
+          deleted: true,
+          deletedBy: deletedBy,
+        }
+      );
+      res.status(200).json({
+        success: true,
+        message: 'Dự án xóa thành công',
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 
   //   // [PATCH] /admin/api/v1/projects/change-status/:id
   //   changeStatus: async (req: Request, res: Response) => {

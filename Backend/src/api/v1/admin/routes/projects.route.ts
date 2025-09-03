@@ -32,7 +32,7 @@ router.post('/create', createValidator.createdProject, controller.create);
 router.patch('/edit/:id', editValidator.editProject, controller.edit);
 
 // // [DELETE] /admin/api/v1/projects/delete/:id
-// router.delete('/delete/:id', deleteValidator.delete, controller.delete);
+router.delete('/delete/:id', deleteValidator.delete, controller.delete);
 
 // // [PATCH] /admin/api/v1/projects/change-status/:id
 // router.patch(
