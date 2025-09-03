@@ -18,6 +18,32 @@ export const editValidator = {
     next();
   },
 
+  editProject: (req: Request, res: Response, next: NextFunction) => {
+    if (!req.params.id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Project ID không tồn tại',
+      });
+    }
+    if (!req.body.title) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tiêu đề không tồn tại',
+      });
+    }
+    if (
+      req.body.status &&
+      !['active', 'completed', 'archived', 'inactive'].includes(req.body.status)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Trạng thái không hợp lệ',
+      });
+    }
+
+    next();
+  },
+
   editAccount: (req: Request, res: Response, next: NextFunction) => {
     if (!req.params.id) {
       return res.status(400).json({

@@ -28,8 +28,8 @@ router.get('/', controller.index('index'));
 // [PATCH] /admin/api/v1/projects/create
 router.post('/create', createValidator.createdProject, controller.create);
 
-// // [PATCH] /admin/api/v1/projects/edit/:id
-// router.patch('/edit/:id', editValidator.edit, controller.edit);
+// [PATCH] /admin/api/v1/projects/edit/:id
+router.patch('/edit/:id', editValidator.editProject, controller.edit);
 
 // // [DELETE] /admin/api/v1/projects/delete/:id
 // router.delete('/delete/:id', deleteValidator.delete, controller.delete);

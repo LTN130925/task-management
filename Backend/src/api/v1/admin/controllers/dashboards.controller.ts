@@ -15,7 +15,7 @@ import { systemProgress } from '../services/systemProgress';
 import { pagination } from '../../../../helpers/pagination';
 
 export const controller = {
-  // [GET] /api/v1/admin/dashboards/dropdowns
+  // [GET] /api/v1/admin/dashboard/dropdowns
   dropdown: async (req: Request, res: Response) => {
     // dùng làm bảng chọn người dùng lọc thông tin người dùng req.query bên dưới progress dashboard
     try {
@@ -47,7 +47,7 @@ export const controller = {
     }
   },
 
-  // [GET] /api/v1/admin/dashboards/progress
+  // [GET] /api/v1/admin/dashboard/progress
   progress: async (req: Request, res: Response) => {
     try {
       const { status, userId, from, to, keyword }: any = req.query;
@@ -112,7 +112,7 @@ export const controller = {
     }
   },
 
-  // [GET] /api/v1/admin/dashboards/system
+  // [GET] /api/v1/admin/dashboard/system
   system: async (req: Request, res: Response) => {
     try {
       const system = await systemProgress();

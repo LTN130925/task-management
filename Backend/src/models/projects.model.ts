@@ -10,7 +10,7 @@ const projectSchema = new mongoose.Schema(
         const date = new Date();
         date.setDate(date.getDate() + 30);
         return date;
-      }, // 1 month
+      },
     },
     status: {
       type: String,
@@ -30,6 +30,7 @@ const projectSchema = new mongoose.Schema(
     },
     updatedBy: [
       {
+        title: String,
         updatedById: String,
         updatedAt: Date,
       },
