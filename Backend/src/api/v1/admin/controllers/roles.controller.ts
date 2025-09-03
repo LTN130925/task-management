@@ -97,7 +97,7 @@ export const controller = {
         });
       }
       req.body.createdBy = {
-        account_id: req.account?.id,
+        account_id: req.account._id,
       };
       const role = new Role(req.body);
       await role.save();
@@ -132,7 +132,7 @@ export const controller = {
       }
 
       const updatedBy = {
-        account_id: req.account?.id,
+        account_id: req.account._id,
         title: 'Cập nhật nhóm quyền',
         updatedAt: new Date(),
       };
@@ -173,7 +173,7 @@ export const controller = {
         });
       }
       const deletedBy = {
-        account_id: req.account?.id,
+        account_id: req.account._id,
         deletedAt: new Date(),
       }
       await Role.updateOne(
@@ -206,7 +206,7 @@ export const controller = {
       }
       const { ids } = req.body;
       const deletedBy = {
-        account_id: req.account?.id,
+        account_id: req.account._id,
         deletedAt: new Date(),
       }
       await Role.updateMany(

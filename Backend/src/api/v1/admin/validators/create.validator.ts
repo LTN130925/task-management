@@ -13,6 +13,13 @@ export const createValidator = {
       });
     }
 
+    if (req.body.status && !['active', 'inactive'].includes(req.body.status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Trạng thái không hợp lệ',
+      });
+    }
+
     next();
   },
 

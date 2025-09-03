@@ -1,13 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 
-import isValidPassword from '../../../../helpers/securePassword';
-
 export const editValidator = {
   edit: (req: Request, res: Response, next: NextFunction) => {
     if (!req.body.title) {
       return res.status(400).json({
         success: false,
         message: 'Tiêu đề không tồn tại',
+      });
+    }
+    if (req.body.status && !['active', 'inactive'].includes(req.body.status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Trạng thái không hợp lệ',
       });
     }
 
@@ -31,6 +35,41 @@ export const editValidator = {
       return res.status(400).json({
         success: false,
         message: 'Email không tồn tại',
+      });
+    }
+    if (req.body.status && !['active', 'inactive'].includes(req.body.status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Trạng thái không hợp lệ',
+      });
+    }
+
+    next();
+  },
+
+  editProfile: (req: Request, res: Response, next: NextFunction) => {
+    if (!req.body.fullName) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tên người dùng không tồn tại',
+      });
+    }
+    if (!req.body.email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email không tồn tại',
+      });
+    }
+    if (req.body.password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Không thể đổi mật khẩu',
+      });
+    }
+    if (req.body.status) {
+      return res.status(400).json({
+        success: false,
+        message: 'Không thể đổi trạng thái',
       });
     }
 

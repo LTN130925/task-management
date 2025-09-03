@@ -192,9 +192,10 @@ export const controller = {
           message: 'Bạn không có quyền truy cập',
         });
       }
-      req.body.createdBy = req.account?.id;
+      req.body.createdBy = req.account._id;
       const newTask = new Task(req.body);
       await newTask.save();
+      
       res.status(201).json({
         success: true,
         message: 'Task tạo thành công',

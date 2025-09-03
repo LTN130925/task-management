@@ -128,7 +128,7 @@ export const controller = {
       delete req.body.confirmPassword;
 
       req.body.createdBy = {
-        account_id: req.account?.id,
+        account_id: req.account._id,
       };
 
       const account = new Account(req.body);
@@ -165,7 +165,7 @@ export const controller = {
         });
       }
       const updatedBy = {
-        account_id: req.account?.id,
+        account_id: req.account._id,
         title: 'Cập nhật tài khoản',
         updatedAt: new Date(),
       };
@@ -207,7 +207,7 @@ export const controller = {
         });
       }
       const deletedBy = {
-        account_id: req.account?.id,
+        account_id: req.account._id,
         deletedAt: new Date(),
       };
       await Account.updateOne(
@@ -309,7 +309,7 @@ export const controller = {
         });
       }
       const updatedBy = {
-        account_id: req.account?.id,
+        account_id: req.account._id,
         title: 'thay đổi trạng tài khoản',
         updatedAt: new Date(),
       };
@@ -348,14 +348,14 @@ export const controller = {
           updateValue = {
             [key]: value,
             deletedBy: {
-              account_id: req.account?.id,
+              account_id: req.account._id,
               deletedAt: new Date(),
             },
           };
           break;
         case 'status':
           const updatedBy = {
-            account_id: req.account?.id,
+            account_id: req.account._id,
             title: 'Cập nhật trạng thái',
             updatedAt: new Date(),
           };

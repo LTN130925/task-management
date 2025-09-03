@@ -151,7 +151,7 @@ export const controller = {
         });
       }
       req.body.createdBy = {
-        admin_id: req.account?.id,
+        admin_id: req.account._id,
       };
       delete req.body.confirmPassword;
       req.body.password = await bcrypt.hash(req.body.password, 10);
@@ -194,7 +194,7 @@ export const controller = {
 
       const updatedBy = {
         title: 'cập nhật thông tin người dùng',
-        admin_id: req.account?.id,
+        admin_id: req.account._id,
         updatedAt: new Date(),
       };
       await User.updateOne(
@@ -237,7 +237,7 @@ export const controller = {
         });
       }
       const deletedBy = {
-        admin_id: req.account?.id,
+        admin_id: req.account._id,
         deletedAt: new Date(),
       };
       await User.updateOne(
@@ -282,7 +282,7 @@ export const controller = {
       }
       const updatedBy = {
         title: 'cập nhật trạng thái người dùng',
-        admin_id: req.account?.id,
+        admin_id: req.account._id,
         updatedAt: new Date(),
       };
       await User.updateOne(
@@ -322,7 +322,7 @@ export const controller = {
           updateValue = {
             [key]: value,
             deletedBy: {
-              admin_id: req.account?.id,
+              admin_id: req.account._id,
               deletedAt: new Date(),
             },
           };
@@ -330,7 +330,7 @@ export const controller = {
         case 'status':
           updatedBy = {
             title: 'cập nhật trạng thái người dùng',
-            admin_id: req.account?.id,
+            admin_id: req.account._id,
             updatedAt: new Date(),
           };
           updateValue = {
@@ -341,7 +341,7 @@ export const controller = {
         case 'restore':
           updatedBy = {
             title: 'khôi phục tài khoản người dùng',
-            admin_id: req.account?.id,
+            admin_id: req.account._id,
             updatedAt: new Date(),
           };
           updateValue = {
@@ -428,7 +428,7 @@ export const controller = {
       }
       const updatedBy = {
         title: 'khôi phục tài khoản người dùng',
-        admin_id: req.account?.id,
+        admin_id: req.account._id,
         updatedAt: new Date(),
       };
 
