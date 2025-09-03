@@ -157,32 +157,32 @@ export const controller = {
   // },
 
   // [POST] /admin/api/v1/projects/create
-  // create: async (req: Request, res: Response) => {
-  //   try {
-  //     // if (!req.role.permissions.includes('projects_create')) {
-  //     //   return res.status(403).json({
-  //     //     success: false,
-  //     //     message: 'Bạn không có quyền truy cập',
-  //     //   });
-  //     // }
-  //     req.body.createdBy = {
-  //       createdById: req.account._id,
-  //     };
-  //     const newProject = new Project(req.body);
-  //     await newProject.save();
+  create: async (req: Request, res: Response) => {
+    try {
+      // if (!req.role.permissions.includes('projects_create')) {
+      //   return res.status(403).json({
+      //     success: false,
+      //     message: 'Bạn không có quyền truy cập',
+      //   });
+      // }
+      req.body.createdBy = {
+        createdById: req.account._id,
+      };
+      const newProject = new Project(req.body);
+      await newProject.save();
 
-  //     res.status(201).json({
-  //       success: true,
-  //       message: 'Project tạo thành công',
-  //       data: newProject,
-  //     });
-  //   } catch (err) {
-  //     return res.status(500).json({
-  //       success: false,
-  //       message: 'Lỗi server',
-  //     });
-  //   }
-  // },
+      res.status(201).json({
+        success: true,
+        message: 'Project tạo thành công',
+        data: newProject,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 
   // // [PATCH] /admin/api/v1/projects/edit/:id
   // edit: async (req: Request, res: Response) => {

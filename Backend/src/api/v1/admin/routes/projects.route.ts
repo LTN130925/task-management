@@ -26,7 +26,7 @@ router.get('/', controller.index('index'));
 // router.get('/detail/:id', detailValidator.detail, controller.detail('index'));
 
 // [PATCH] /admin/api/v1/projects/create
-// router.post('/create', createValidator.createdProject, controller.create);
+router.post('/create', createValidator.createdProject, controller.create);
 
 // // [PATCH] /admin/api/v1/projects/edit/:id
 // router.patch('/edit/:id', editValidator.edit, controller.edit);
