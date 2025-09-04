@@ -100,9 +100,22 @@ export const controller = {
           })
             .lean()
             .select('fullName');
-          project.createdBy.fullName = account
-            ? account.fullName
-            : 'không tìm thấy';
+
+          // get full name created by
+          project.createdBy.fullName = account ? account.fullName : 'không';
+
+          // get full name updated by
+          if (project.updatedBy.length > 0) {
+            const lastUpdated = project.updatedBy[project.updatedBy.length - 1];
+            const userUpdated = await Account.findOne({
+              _id: lastUpdated.updatedById,
+              deleted: false,
+            })
+              .lean()
+              .select('fullName');
+
+            lastUpdated.fullName = userUpdated ? userUpdated.fullName : 'không';
+          }
         }
 
         res.status(200).json({
@@ -121,38 +134,63 @@ export const controller = {
   },
 
   // [GET] /admin/api/v1/projects/detail/:id
-  // detail: (route: string) => {
-  //   return async (req: Request, res: Response) => {
-  //     try {
-  //       if (!req.role.permissions.includes('projects_view')) {
-  //         return res.status(403).json({
-  //           success: false,
-  //           message: 'Bạn không có quyền truy cập',
-  //         });
-  //       }
-  //       const project = await Project.findOne({
-  //         _id: req.params.id,
-  //         deleted: route === 'trash' ? true : false,
-  //       }).lean();
+  detail: (route: string) => {
+    return async (req: Request, res: Response) => {
+      try {
+        // if (!req.role.permissions.includes('projects_view')) {
+        //   return res.status(403).json({
+        //     success: false,
+        //     message: 'Bạn không có quyền truy cập',
+        //   });
+        // }
+        const project: any = await Project.findOne({
+          _id: req.params.id,
+          deleted: route === 'trash' ? true : false,
+        }).lean();
 
-  //       if (!project) {
-  //         return res.status(404).json({
-  //           success: false,
-  //           message: 'Không tìm thấy project',
-  //         });
-  //       }
-  //       res.status(200).json({
-  //         success: true,
-  //         data: project,
-  //       });
-  //     } catch (error) {
-  //       return res.status(500).json({
-  //         success: false,
-  //         message: 'Lỗi server',
-  //       });
-  //     }
-  //   };
-  // },
+        if (!project) {
+          return res.status(404).json({
+            success: false,
+            message: 'Không tìm thấy project',
+          });
+        }
+
+        const account = await Account.findOne({
+          _id: project.createdBy.createdById,
+          deleted: false,
+        })
+          .lean()
+          .select('fullName');
+
+        // get full name created by
+        project.createdBy.fullName = account ? account.fullName : 'không';
+
+        // get full name updated by
+        if (project.updatedBy.length > 0) {
+          for (const updated of project.updatedBy) {
+            const userUpdated = await Account.findOne({
+              _id: updated.updatedById,
+              deleted: false,
+            })
+              .lean()
+              .select('fullName');
+
+            updated.fullName = userUpdated ? userUpdated.fullName : 'không';
+          }
+        }
+
+        res.status(200).json({
+          success: true,
+          data: project,
+        });
+      } catch (error) {
+        return res.status(500).json({
+          success: false,
+          message: 'Lỗi server',
+        });
+      }
+    };
+  },
 
   // [POST] /admin/api/v1/projects/create
   create: async (req: Request, res: Response) => {

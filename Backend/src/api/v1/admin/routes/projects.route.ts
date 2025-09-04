@@ -22,8 +22,8 @@ router.get('/dropdowns/admins', controller.dropdowns);
 // [GET] /admin/api/v1/projects
 router.get('/', controller.index('index'));
 
-// // [GET] /admin/api/v1/projects/detail/:id
-// router.get('/detail/:id', detailValidator.detail, controller.detail('index'));
+// [GET] /admin/api/v1/projects/detail/:id
+router.get('/detail/:id', detailValidator.detail, controller.detail('index'));
 
 // [PATCH] /admin/api/v1/projects/create
 router.post('/create', createValidator.createdProject, controller.create);
