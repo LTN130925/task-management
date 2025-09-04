@@ -16,6 +16,13 @@ const VALID_VALUES_TASKS: Record<string, any[]> = {
   'deleted-permanently': [true],
 };
 
+const VALID_VALUES_PROJECTS: Record<string, any[]> = {
+  status: ['active', 'inactive', 'completed', 'archived'],
+  deleted: [true],
+  restore: [false],
+  'deleted-permanently': [true],
+};
+
 const VALID_VALUES: Record<string, any[]> = {
   status: ['active', 'inactive'],
   deleted: [true],
@@ -38,6 +45,29 @@ export const changeStatusValidator = {
       });
     }
     if (!VALID_VALUES_TASKS['status'].includes(req.body.status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Không tìm thấy trạng thái hợp lí!',
+      });
+    }
+
+    next();
+  },
+
+  changeStatusProject: (req: Request, res: Response, next: NextFunction) => {
+    if (!req.params.id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Project ID không tồn tại',
+      });
+    }
+    if (!req.body.status) {
+      return res.status(400).json({
+        success: false,
+        message: 'Trạng thái không tồn tại',
+      });
+    }
+    if (!VALID_VALUES_PROJECTS['status'].includes(req.body.status)) {
       return res.status(400).json({
         success: false,
         message: 'Không tìm thấy trạng thái hợp lí!',

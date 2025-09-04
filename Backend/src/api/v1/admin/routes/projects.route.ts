@@ -34,12 +34,12 @@ router.patch('/edit/:id', editValidator.editProject, controller.edit);
 // // [DELETE] /admin/api/v1/projects/delete/:id
 router.delete('/delete/:id', deleteValidator.delete, controller.delete);
 
-// // [PATCH] /admin/api/v1/projects/change-status/:id
-// router.patch(
-//   '/change-status/:id',
-//   changeStatusValidator.changeStatus,
-//   controller.changeStatus
-// );
+// [PATCH] /admin/api/v1/projects/change-status/:id
+router.patch(
+  '/change-status/:id',
+  changeStatusValidator.changeStatusProject,
+  controller.changeStatus
+);
 
 // // [PATCH] /admin/api/v1/projects/change-multi
 // router.patch(
