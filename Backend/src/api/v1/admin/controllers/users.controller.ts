@@ -14,12 +14,12 @@ export const controller = {
   index: (route: string) => {
     return async (req: Request, res: Response) => {
       try {
-        // if (!req.role.permissions.includes('users_view')) {
-        //   return res.status(403).json({
-        //     success: false,
-        //     message: 'Bạn không có quyền truy cập',
-        //   });
-        // }
+        if (!req.role.permissions.includes('users_view')) {
+          return res.status(403).json({
+            success: false,
+            message: 'Bạn không có quyền truy cập',
+          });
+        }
         const filter: any = {
           deleted: route === 'trash' ? true : false,
         };
