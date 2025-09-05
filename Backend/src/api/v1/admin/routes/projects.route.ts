@@ -73,11 +73,11 @@ router.patch(
   controller.restore
 );
 
-// // [PATCH] /admin/api/v1/projects/trash/change-multi
-// router.patch(
-//   `${systemConfig.prefixTrash}/change-multi`,
-//   changeStatusValidator.changeMulti,
-//   controller.changeMulti
-// );
+// [PATCH] /admin/api/v1/projects/trash/change-multi
+router.patch(
+  `${systemConfig.prefixTrash}/change-multi`,
+  changeStatusValidator.changeMultiProject,
+  controller.changeMulti
+);
 
 export default router;

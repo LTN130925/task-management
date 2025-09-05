@@ -434,7 +434,7 @@ export const controller = {
             $push: { updatedBy: updatedBy },
           };
           break;
-        case 'delete-permanently':
+        case 'deleted-permanently':
           await Project.deleteMany({ _id: { $in: ids }, deleted: true });
           return res.status(200).json({
             success: true,

@@ -13,21 +13,18 @@ const VALID_VALUES_TASKS: Record<string, any[]> = {
   status: ['initial', 'doing', 'finish', 'pending', 'notFinish'],
   deleted: [true],
   restore: [false],
-  'deleted-permanently': [true],
 };
 
 const VALID_VALUES_PROJECTS: Record<string, any[]> = {
   status: ['active', 'inactive', 'completed', 'archived'],
   deleted: [true],
   restore: [false],
-  'deleted-permanently': [true],
 };
 
 const VALID_VALUES: Record<string, any[]> = {
   status: ['active', 'inactive'],
   deleted: [true],
   restore: [false],
-  'deleted-permanently': [true],
 };
 
 export const changeStatusValidator = {
@@ -93,7 +90,10 @@ export const changeStatusValidator = {
       });
     }
 
-    if (!VALID_VALUES_TASKS[key].includes(value)) {
+    if (
+      key !== 'deleted-permanently' &&
+      !VALID_VALUES_TASKS[key].includes(value)
+    ) {
       return res.status(400).json({
         success: false,
         message: 'Không tìm thấy trạng thái hợp lí!',
@@ -119,7 +119,10 @@ export const changeStatusValidator = {
       });
     }
 
-    if (!VALID_VALUES_PROJECTS[key].includes(value)) {
+    if (
+      key !== 'deleted-permanently' &&
+      !VALID_VALUES_PROJECTS[key].includes(value)
+    ) {
       return res.status(400).json({
         success: false,
         message: 'Không tìm thấy trạng thái hợp lí!',
@@ -179,7 +182,7 @@ export const changeStatusValidator = {
         }
       }
 
-      if (!VALID_VALUES[key].includes(value)) {
+      if (key !== 'deleted-permanently' && !VALID_VALUES[key].includes(value)) {
         return res.status(400).json({
           success: false,
           message: 'Không tìm thấy trạng thái hợp lí!',
