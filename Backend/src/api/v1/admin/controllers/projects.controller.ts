@@ -8,7 +8,7 @@ import Account from '../../../../models/accounts.model';
 import { pagination } from '../../../../helpers/pagination';
 
 export const controller = {
-  // [GET] /admin/api/v1/projects/dropdowns/admins
+  // [GET] /admin/api/v1/projects/dropdowns
   dropdowns: async (req: Request, res: Response) => {
     // dùng làm bảng chọn người dùng lọc thông tin người dùng req.query bên dưới project index
     try {
@@ -40,12 +40,12 @@ export const controller = {
   index: (route: string) => {
     return async (req: Request, res: Response) => {
       try {
-        // if (!req.role.permissions.includes('projects_view')) {
-        //   return res.status(403).json({
-        //     success: false,
-        //     message: 'Bạn không có quyền truy cập',
-        //   });
-        // }
+        if (!req.role.permissions.includes('projects_view')) {
+          return res.status(403).json({
+            success: false,
+            message: 'Bạn không có quyền truy cập',
+          });
+        }
         const filter: any = {
           deleted: route === 'trash' ? true : false,
         };
@@ -157,12 +157,12 @@ export const controller = {
   detail: (route: string) => {
     return async (req: Request, res: Response) => {
       try {
-        // if (!req.role.permissions.includes('projects_view')) {
-        //   return res.status(403).json({
-        //     success: false,
-        //     message: 'Bạn không có quyền truy cập',
-        //   });
-        // }
+        if (!req.role.permissions.includes('projects_view')) {
+          return res.status(403).json({
+            success: false,
+            message: 'Bạn không có quyền truy cập',
+          });
+        }
         const project: any = await Project.findOne({
           _id: req.params.id,
           deleted: route === 'trash' ? true : false,
@@ -228,12 +228,12 @@ export const controller = {
   // [POST] /admin/api/v1/projects/create
   create: async (req: Request, res: Response) => {
     try {
-      // if (!req.role.permissions.includes('projects_create')) {
-      //   return res.status(403).json({
-      //     success: false,
-      //     message: 'Bạn không có quyền truy cập',
-      //   });
-      // }
+      if (!req.role.permissions.includes('projects_create')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       req.body.createdBy = {
         createdById: req.account._id,
       };
@@ -256,12 +256,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/projects/edit/:id
   edit: async (req: Request, res: Response) => {
     try {
-      // if (!req.role.permissions.includes('projects_edit')) {
-      //   return res.status(403).json({
-      //     success: false,
-      //     message: 'Bạn không có quyền truy cập',
-      //   });
-      // }
+      if (!req.role.permissions.includes('projects_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const project = await Project.findOne({
         _id: id,
@@ -301,12 +301,12 @@ export const controller = {
   // [DELETE] /admin/api/v1/projects/delete/:id
   delete: async (req: Request, res: Response) => {
     try {
-      // if (!req.role.permissions.includes('projects_delete')) {
-      //   return res.status(403).json({
-      //     success: false,
-      //     message: 'Bạn không có quyền truy cập',
-      //   });
-      // }
+      if (!req.role.permissions.includes('projects_delete')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const project = await Project.findOne({
         _id: id,
@@ -345,12 +345,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/projects/change-status/:id
   changeStatus: async (req: Request, res: Response) => {
     try {
-      // if (!req.role.permissions.includes('projects_edit')) {
-      //   return res.status(403).json({
-      //     success: false,
-      //     message: 'Bạn không có quyền truy cập',
-      //   });
-      // }
+      if (!req.role.permissions.includes('projects_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const { status } = req.body;
       const project = await Project.findOne({
@@ -393,12 +393,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/projects/trash/change-multi
   changeMulti: async (req: Request, res: Response) => {
     try {
-      // if (!req.role.permissions.includes('projects_edit')) {
-      //   return res.status(403).json({
-      //     success: false,
-      //     message: 'Bạn không có quyền truy cập',
-      //   });
-      // }
+      if (!req.role.permissions.includes('projects_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { ids, key, value } = req.body;
       let updatedBy: any;
       let updateValue: any;
@@ -467,12 +467,12 @@ export const controller = {
   // [DELETE] /admin/api/v1/projects/trash/delete-permanently/:id
   deletePermanently: async (req: Request, res: Response) => {
     try {
-      // if (!req.role.permissions.includes('projects_delete')) {
-      //   return res.status(403).json({
-      //     success: false,
-      //     message: 'Bạn không có quyền truy cập',
-      //   });
-      // }
+      if (!req.role.permissions.includes('projects_delete')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const project = await Project.findOne({
         _id: id,
@@ -504,12 +504,12 @@ export const controller = {
   // [PATCH] /admin/api/v1/projects/trash/restore/:id
   restore: async (req: Request, res: Response) => {
     try {
-      // if (!req.role.permissions.includes('projects_edit')) {
-      //   return res.status(403).json({
-      //     success: false,
-      //     message: 'Bạn không có quyền truy cập',
-      //   });
-      // }
+      if (!req.role.permissions.includes('projects_edit')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền truy cập',
+        });
+      }
       const { id } = req.params;
       const project = await Project.findOne({
         _id: id,

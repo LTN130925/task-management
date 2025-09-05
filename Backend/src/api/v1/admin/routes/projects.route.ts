@@ -16,8 +16,8 @@ import { editValidator } from '../validators/edit.validator';
 
 const router = Router();
 
-// [GET] /admin/api/v1/dropdowns/users
-router.get('/dropdowns/admins', controller.dropdowns);
+// [GET] /admin/api/v1/dropdowns
+router.get('/dropdowns', controller.dropdowns);
 
 // [GET] /admin/api/v1/projects
 router.get('/', controller.index('index'));
