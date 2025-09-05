@@ -45,17 +45,7 @@ router.post(
   controller.resetPassword
 );
 
-// [GET] /api/v1/user/profile
-router.get('/profile', Auth.requireAuth, controller.profile);
 
-// [PATCH] /api/v1/user/profile/edit
-router.patch(
-  '/profile/edit',
-  Auth.requireAuth,
-  upload.single('avatar'),
-  uploadCloud.upload as any,
-  controller.editProfile
-);
 
 // [GET] /api/v1/user/list
 router.get('/list', Auth.requireAuth, controller.list);

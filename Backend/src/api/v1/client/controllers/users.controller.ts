@@ -49,6 +49,14 @@ export const controller = {
   login: async (req: Request, res: Response) => {
     try {
       const user: any = await User.findOne({ email: req.body.email });
+
+      if (user.deleted) {
+        return res.status(401).json({
+          success: false,
+          message: 'Tài khoản không tồn tại',
+        });
+      }
+
       if (!user) {
         return res.status(401).json({
           success: false,
@@ -270,37 +278,6 @@ export const controller = {
       res
         .status(200)
         .json({ success: true, message: 'Đổi mật khẩu thành công' });
-    } catch (err) {
-      res.status(500).json({
-        success: false,
-        message: 'Lỗi server',
-      });
-    }
-  },
-
-  // [GET] /api/v1/user/profile
-  profile: async (req: Request, res: Response) => {
-    try {
-      res.status(200).json({
-        success: true,
-        data: req.user,
-      });
-    } catch (err) {
-      res.status(500).json({
-        success: false,
-        message: 'Lỗi server',
-      });
-    }
-  },
-
-  // [PATCH] /api/v1/user/profile/edit
-  editProfile: async (req: Request, res: Response) => {
-    try {
-      await User.updateOne({ _id: req.user._id }, req.body);
-      res.status(200).json({
-        success: true,
-        data: req.user,
-      });
     } catch (err) {
       res.status(500).json({
         success: false,
