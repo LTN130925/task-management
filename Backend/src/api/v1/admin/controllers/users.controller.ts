@@ -7,6 +7,7 @@ import User from '../../../../models/users.model';
 // helpers
 import { pagination } from '../../../../helpers/pagination';
 import { makeNameUserInfo } from '../services/setNameUser';
+import Account from '../../../../models/accounts.model';
 
 export const controller = {
   // [GET] /admin/api/v1/users
@@ -67,7 +68,7 @@ export const controller = {
 
         if (route === 'trash') {
           for (const user of users) {
-            const userDeleted = await User.findOne({
+            const userDeleted = await Account.findOne({
               _id: user.deletedBy.admin_id,
               deleted: false,
             })
@@ -119,18 +120,31 @@ export const controller = {
         };
         const user: any = await User.findOne(filter)
           .lean()
-          .select('-password -deletedBy');
+          .select('-password');
         if (!user) {
           return res.status(404).json({
             success: false,
             message: 'Người dùng không tồn tại',
           });
         }
-        // created by
-        await makeNameUserInfo.getFullNameCreated(user);
 
-        // updated by
-        await makeNameUserInfo.getAllFullNameUpdated(user);
+        if (route === 'trash') {
+          const userDeleted = await Account.findOne({
+            _id: user.deletedBy.admin_id,
+            deleted: false,
+          })
+            .lean()
+            .select('fullName');
+          user.deletedBy.fullName = userDeleted
+            ? userDeleted.fullName
+            : 'không';
+        } else {
+          // created by
+          await makeNameUserInfo.getFullNameCreated(user);
+
+          // updated by
+          await makeNameUserInfo.getAllFullNameUpdated(user);
+        }
 
         res.status(200).json({
           success: true,

@@ -175,27 +175,40 @@ export const controller = {
           });
         }
 
-        const account = await Account.findOne({
-          _id: project.createdBy.createdById,
-          deleted: false,
-        })
-          .lean()
-          .select('fullName');
+        if (route === 'trash') {
+          const account = await Account.findOne({
+            _id: project.deletedBy.deletedById,
+            deleted: false,
+          })
+            .lean()
+            .select('fullName');
 
-        // get full name created by
-        project.createdBy.fullName = account ? account.fullName : 'không';
+          // get full name deleted by
+          project.deletedBy.fullName = account ? account.fullName : 'không';
+        } else {
+          const account = await Account.findOne({
+            _id: project.createdBy.createdById,
+            deleted: false,
+          })
+            .lean()
+            .select('fullName');
 
-        // get full name updated by
-        if (project.updatedBy.length > 0) {
-          for (const updated of project.updatedBy) {
-            const userUpdated = await Account.findOne({
-              _id: updated.updatedById,
-              deleted: false,
-            })
-              .lean()
-              .select('fullName');
+          // get full name created by
+          project.createdBy.fullName = account ? account.fullName : 'không';
 
-            updated.fullName = userUpdated ? userUpdated.fullName : 'không';
+          // get full name updated by
+          if (project.updatedBy.length > 0) {
+            for (const updated of project.updatedBy) {
+              const userUpdated = await Account.findOne({
+                _id: updated.updatedById,
+                deleted: false,
+              })
+                .lean()
+                .select('fullName');
+
+              // get full name updated by
+              updated.fullName = userUpdated ? userUpdated.fullName : 'không';
+            }
           }
         }
 

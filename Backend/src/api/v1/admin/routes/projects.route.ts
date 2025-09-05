@@ -52,12 +52,12 @@ router.patch(
 // [GET] /admin/api/v1/projects/trash
 router.get(`${systemConfig.prefixTrash}`, controller.index('trash'));
 
-// // [GET] /admin/api/v1/projects/trash/detail/:id
-// router.get(
-//   `${systemConfig.prefixTrash}/detail/:id`,
-//   detailValidator.detail,
-//   controller.detail('trash')
-// );
+// [GET] /admin/api/v1/projects/trash/detail/:id
+router.get(
+  `${systemConfig.prefixTrash}/detail/:id`,
+  detailValidator.detail,
+  controller.detail('trash')
+);
 
 // // [DELETE] /admin/api/v1/projects/trash/delete-permanently/:id
 // router.delete(
