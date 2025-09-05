@@ -103,6 +103,32 @@ export const changeStatusValidator = {
     next();
   },
 
+  changeMultiProject: (req: Request, res: Response, next: NextFunction) => {
+    const { ids, key, value } = req.body;
+    if (!ids || !Array.isArray(ids)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Danh sách project ID không tồn tại',
+      });
+    }
+
+    if (!VALID_KEYS.includes(key)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Không tìm thấy trạng thái hợp lí!',
+      });
+    }
+
+    if (!VALID_VALUES_PROJECTS[key].includes(value)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Không tìm thấy trạng thái hợp lí!',
+      });
+    }
+
+    next();
+  },
+
   changeStatusAccount: (req: Request, res: Response, next: NextFunction) => {
     if (!req.params.id) {
       return res.status(400).json({

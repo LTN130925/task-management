@@ -41,12 +41,12 @@ router.patch(
   controller.changeStatus
 );
 
-// // [PATCH] /admin/api/v1/projects/change-multi
-// router.patch(
-//   '/change-multi',
-//   changeStatusValidator.changeMulti,
-//   controller.changeMulti
-// );
+// [PATCH] /admin/api/v1/projects/change-multi
+router.patch(
+  '/change-multi',
+  changeStatusValidator.changeMultiProject,
+  controller.changeMulti
+);
 
 //                    TRASH
 // // [GET] /admin/api/v1/projects/trash

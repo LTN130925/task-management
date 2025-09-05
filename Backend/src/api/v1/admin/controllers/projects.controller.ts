@@ -359,53 +359,78 @@ export const controller = {
     }
   },
 
-  //   // [PATCH] /admin/api/v1/projects/change-multi
-  //   // [PATCH] /admin/api/v1/projects/trash/change-multi
-  //   changeMulti: async (req: Request, res: Response) => {
-  //     try {
-  //       if (!req.role.permissions.includes('projects_edit')) {
-  //         return res.status(403).json({
-  //           success: false,
-  //           message: 'Bạn không có quyền truy cập',
-  //         });
-  //       }
-  //       const { ids, key, value } = req.body;
-  //       switch (key) {
-  //         // => TRASH
-  //         case 'restore':
-  //           req.body.key = 'deleted';
-  //           break;
-  //         case 'deleted-permanently':
-  //           await Task.deleteMany({
-  //             _id: { $in: req.body.ids },
-  //             deleted: true,
-  //           });
-  //           return res.status(200).json({
-  //             success: true,
-  //             message: `Task xóa vĩnh viễn ${ids.length} thành công`,
-  //           });
-  //         // END TRASH
-  //         default:
-  //           break;
-  //       }
-  //       await Task.updateMany(
-  //         {
-  //           _id: { $in: ids },
-  //           deleted: key === 'restore' ? true : false,
-  //         },
-  //         { [key]: value }
-  //       );
-  //       return res.status(200).json({
-  //         success: true,
-  //         message: `Task cập nhật trạng thái ${ids.length} thành công`,
-  //       });
-  //     } catch (err) {
-  //       return res.status(500).json({
-  //         success: false,
-  //         message: 'Lỗi server',
-  //       });
-  //     }
-  //   },
+  // [PATCH] /admin/api/v1/projects/change-multi
+  // [PATCH] /admin/api/v1/projects/trash/change-multi
+  changeMulti: async (req: Request, res: Response) => {
+    try {
+      // if (!req.role.permissions.includes('projects_edit')) {
+      //   return res.status(403).json({
+      //     success: false,
+      //     message: 'Bạn không có quyền truy cập',
+      //   });
+      // }
+      const { ids, key, value } = req.body;
+      let updatedBy: any;
+      let updateValue: any;
+      switch (key) {
+        case 'deleted':
+          updateValue = {
+            [key]: value,
+            deletedBy: {
+              deletedById: req.account._id,
+              deletedAt: new Date(),
+            },
+          };
+          break;
+        case 'status':
+          updatedBy = {
+            title: 'cập nhật trạng thái dự án',
+            updatedById: req.account._id,
+            updatedAt: new Date(),
+          };
+          updateValue = {
+            [key]: value,
+            $push: { updatedBy: updatedBy },
+          };
+          break;
+        case 'restore':
+          updatedBy = {
+            title: 'khôi phục dự án',
+            updatedById: req.account._id,
+            updatedAt: new Date(),
+          };
+          updateValue = {
+            deleted: value,
+            $push: { updatedBy: updatedBy },
+          };
+          break;
+        case 'delete-permanently':
+          await Project.deleteMany({ _id: { $in: ids }, deleted: true });
+          return res.status(200).json({
+            success: true,
+            message: `Xóa vĩnh viễn ${ids.length} dự án thành công`,
+          });
+        default:
+          break;
+      }
+      await Project.updateMany(
+        {
+          _id: { $in: ids },
+          deleted: req.body.key === 'restore' ? true : false,
+        },
+        updateValue
+      );
+      return res.status(200).json({
+        success: true,
+        message: `${ids.length} Dự án cập nhật thành công`,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 
   //   //                                TRASH
 
