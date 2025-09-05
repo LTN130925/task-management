@@ -1,11 +1,20 @@
 import { Request, Response } from 'express';
 
 import Account from '../../../../models/accounts.model';
+import Role from '../../../../models/roles.model';
 
 export const controller = {
   // [GET] /admin/api/v1/profile
-  index: (req: Request, res: Response) => {
+  index: async (req: Request, res: Response) => {
     try {
+      const role = await Role.findOne({
+        _id: req.account.role_id,
+        deleted: false,
+      })
+        .lean()
+        .select('title');
+
+      req.account.role = role?.title;
       res.status(200).json({
         success: true,
         data: req.account,
@@ -33,7 +42,7 @@ export const controller = {
           $push: { updatedBy: updatedBy },
         }
       );
-      
+
       res.status(200).json({
         success: true,
         data: req.account,
