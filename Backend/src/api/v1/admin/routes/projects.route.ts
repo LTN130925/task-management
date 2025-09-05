@@ -66,12 +66,12 @@ router.delete(
   controller.deletePermanently
 );
 
-// // [PATCH] /admin/api/v1/projects/trash/restore/:id
-// router.patch(
-//   `${systemConfig.prefixTrash}/restore/:id`,
-//   restoreValidator.restore,
-//   controller.restore
-// );
+// [PATCH] /admin/api/v1/projects/trash/restore/:id
+router.patch(
+  `${systemConfig.prefixTrash}/restore/:id`,
+  restoreValidator.restore,
+  controller.restore
+);
 
 // // [PATCH] /admin/api/v1/projects/trash/change-multi
 // router.patch(

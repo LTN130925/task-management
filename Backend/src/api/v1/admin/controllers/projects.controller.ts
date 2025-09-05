@@ -501,33 +501,48 @@ export const controller = {
     }
   },
 
-  //   // [PATCH] /admin/api/v1/projects/trash/restore/:id
-  //   restore: async (req: Request, res: Response) => {
-  //     try {
-  //       if (!req.role.permissions.includes('projects_edit')) {
-  //         return res.status(403).json({
-  //           success: false,
-  //           message: 'Bạn không có quyền truy cập',
-  //         });
-  //       }
-  //       const { id } = req.params;
-  //       const task = await Task.findOne({ _id: id, deleted: true });
-  //       if (!task) {
-  //         return res.status(404).json({
-  //           success: false,
-  //           message: 'Task không tìm thấy',
-  //         });
-  //       }
-  //       await Task.updateOne({ _id: id, deleted: true }, { deleted: false });
-  //       res.status(200).json({
-  //         success: true,
-  //         message: 'Task cập nhật thành công',
-  //       });
-  //     } catch (err) {
-  //       return res.status(500).json({
-  //         success: false,
-  //         message: 'Lỗi server',
-  //       });
-  //     }
-  //   },
+  // [PATCH] /admin/api/v1/projects/trash/restore/:id
+  restore: async (req: Request, res: Response) => {
+    try {
+      // if (!req.role.permissions.includes('projects_edit')) {
+      //   return res.status(403).json({
+      //     success: false,
+      //     message: 'Bạn không có quyền truy cập',
+      //   });
+      // }
+      const { id } = req.params;
+      const project = await Project.findOne({
+        _id: id,
+        deleted: true,
+      });
+
+      if (!project) {
+        return res.status(404).json({
+          success: false,
+          message: 'Dự án không tìm thấy',
+        });
+      }
+      const updatedBy = {
+        title: 'khôi phục dự án',
+        updatedById: req.account._id,
+        updatedAt: new Date(),
+      };
+      await Project.updateOne(
+        { _id: id },
+        {
+          deleted: false,
+          $push: { updatedBy: updatedBy },
+        }
+      );
+      res.status(200).json({
+        success: true,
+        message: 'Dự án khôi phục thành công',
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 };
