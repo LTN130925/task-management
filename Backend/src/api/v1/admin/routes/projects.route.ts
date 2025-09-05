@@ -59,12 +59,12 @@ router.get(
   controller.detail('trash')
 );
 
-// // [DELETE] /admin/api/v1/projects/trash/delete-permanently/:id
-// router.delete(
-//   `${systemConfig.prefixTrash}/delete-permanently/:id`,
-//   deleteValidator.delete,
-//   controller.deletePermanently
-// );
+// [DELETE] /admin/api/v1/projects/trash/delete-permanently/:id
+router.delete(
+  `${systemConfig.prefixTrash}/delete-permanently/:id`,
+  deleteValidator.delete,
+  controller.deletePermanently
+);
 
 // // [PATCH] /admin/api/v1/projects/trash/restore/:id
 // router.patch(
