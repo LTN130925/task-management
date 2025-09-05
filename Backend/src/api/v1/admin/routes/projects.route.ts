@@ -49,8 +49,8 @@ router.patch(
 );
 
 //                    TRASH
-// // [GET] /admin/api/v1/projects/trash
-// router.get(`${systemConfig.prefixTrash}`, controller.index('trash'));
+// [GET] /admin/api/v1/projects/trash
+router.get(`${systemConfig.prefixTrash}`, controller.index('trash'));
 
 // // [GET] /admin/api/v1/projects/trash/detail/:id
 // router.get(

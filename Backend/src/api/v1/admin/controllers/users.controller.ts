@@ -14,12 +14,12 @@ export const controller = {
   index: (route: string) => {
     return async (req: Request, res: Response) => {
       try {
-        if (!req.role.permissions.includes('users_view')) {
-          return res.status(403).json({
-            success: false,
-            message: 'Bạn không có quyền truy cập',
-          });
-        }
+        // if (!req.role.permissions.includes('users_view')) {
+        //   return res.status(403).json({
+        //     success: false,
+        //     message: 'Bạn không có quyền truy cập',
+        //   });
+        // }
         const filter: any = {
           deleted: route === 'trash' ? true : false,
         };
@@ -63,14 +63,29 @@ export const controller = {
           .sort(sort)
           .skip(helperPagination.skip)
           .limit(helperPagination.limit)
-          .select('-password -deletedBy');
+          .select('-password');
 
-        for (const user of users) {
-          // created by
-          await makeNameUserInfo.getFullNameCreated(user);
+        if (route === 'trash') {
+          for (const user of users) {
+            const userDeleted = await User.findOne({
+              _id: user.deletedBy.admin_id,
+              deleted: false,
+            })
+              .lean()
+              .select('fullName');
 
-          // updated by
-          await makeNameUserInfo.getLastFullNameUpdated(user);
+            user.deletedBy.fullName = userDeleted
+              ? userDeleted.fullName
+              : 'không';
+          }
+        } else {
+          for (const user of users) {
+            // created by
+            await makeNameUserInfo.getFullNameCreated(user);
+
+            // updated by
+            await makeNameUserInfo.getLastFullNameUpdated(user);
+          }
         }
 
         res.status(200).json({

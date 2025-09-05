@@ -96,28 +96,45 @@ export const controller = {
           .skip(helperPagination.skip)
           .limit(helperPagination.limit);
 
-        for (const project of projects) {
-          const account = await Account.findOne({
-            _id: project.createdBy.createdById,
-            deleted: false,
-          })
-            .lean()
-            .select('fullName');
-
-          // get full name created by
-          project.createdBy.fullName = account ? account.fullName : 'không';
-
-          // get full name updated by
-          if (project.updatedBy.length > 0) {
-            const lastUpdated = project.updatedBy[project.updatedBy.length - 1];
-            const userUpdated = await Account.findOne({
-              _id: lastUpdated.updatedById,
+        if (route === 'trash') {
+          for (const project of projects) {
+            const account = await Account.findOne({
+              _id: project.deletedBy.deletedById,
               deleted: false,
             })
               .lean()
               .select('fullName');
 
-            lastUpdated.fullName = userUpdated ? userUpdated.fullName : 'không';
+            // get full name deleted by
+            project.deletedBy.fullName = account ? account.fullName : 'không';
+          }
+        } else {
+          for (const project of projects) {
+            const account = await Account.findOne({
+              _id: project.createdBy.createdById,
+              deleted: false,
+            })
+              .lean()
+              .select('fullName');
+
+            // get full name created by
+            project.createdBy.fullName = account ? account.fullName : 'không';
+
+            // get full name updated by
+            if (project.updatedBy.length > 0) {
+              const lastUpdated =
+                project.updatedBy[project.updatedBy.length - 1];
+              const userUpdated = await Account.findOne({
+                _id: lastUpdated.updatedById,
+                deleted: false,
+              })
+                .lean()
+                .select('fullName');
+
+              lastUpdated.fullName = userUpdated
+                ? userUpdated.fullName
+                : 'không';
+            }
           }
         }
 
