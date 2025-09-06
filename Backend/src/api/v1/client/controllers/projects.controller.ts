@@ -82,31 +82,44 @@ export const controller = {
     });
   },
 
-  // // [GET] /api/v1/tasks/detail/:id
-  // detail: async (req: Request, res: Response) => {
-  //   try {
-  //     const { id } = req.params;
-  //     const task: any = await Task.findOne({
-  //       _id: id,
-  //       deleted: false,
-  //     });
+  // [GET] /api/v1/tasks/detail/:id
+  detail: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const project: any = await Project.findOne({
+        _id: id,
+        deleted: false,
+      })
+        .lean()
+        .select('-updatedBy -deletedBy');
 
-  //     if (!task) {
-  //       return res.status(404).json({
-  //         success: false,
-  //         message: 'Task không tìm thấy',
-  //       });
-  //     }
+      if (!project) {
+        return res.status(404).json({
+          success: false,
+          message: 'Dự án không tìm thấy',
+        });
+      }
 
-  //     res.status(200).json({
-  //       success: true,
-  //       data: task,
-  //     });
-  //   } catch (error) {
-  //     return res.status(500).json({
-  //       success: false,
-  //       message: 'Lỗi server',
-  //     });
-  //   }
-  // },
+      const account = await Account.findOne({
+        _id: project.createdBy?.createdById,
+        deleted: false,
+      })
+        .lean()
+        .select('fullName');
+
+      project.createdBy.fullName = account
+        ? account.fullName
+        : 'không tìm thấy';
+
+      res.status(200).json({
+        success: true,
+        data: project,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
 };

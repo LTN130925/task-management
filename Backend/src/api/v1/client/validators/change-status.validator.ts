@@ -24,9 +24,7 @@ export const changeStatusValidator = {
     if (!validStatuses.includes(req.body.status)) {
       return res.status(400).json({
         success: false,
-        message: `Không tìm thấy trạng thái. Trạng thái hợp lý: ${validStatuses.join(
-          ', '
-        )}`,
+        message: `Không tìm thấy trạng thái`,
       });
     }
 
@@ -51,9 +49,7 @@ export const changeStatusValidator = {
     if (key === 'status' && !validatorValues.includes(value)) {
       return res.status(400).json({
         success: false,
-        message: `Không tìm thấy trạng thái. Trạng thái hợp lý: ${validatorValues.join(
-          ', '
-        )}`,
+        message: `Không tìm thấy trạng thái`,
       });
     }
 
