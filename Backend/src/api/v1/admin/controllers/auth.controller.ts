@@ -103,7 +103,7 @@ export const controller = {
         status: account.status,
       };
       const accessToken = jwt.sign(payload, process.env.SECRET_KEY as string, {
-        expiresIn: '15m',
+        expiresIn: '1h',
       });
       return res.status(200).json({
         success: true,

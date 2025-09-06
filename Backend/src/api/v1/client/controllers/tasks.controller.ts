@@ -12,7 +12,7 @@ export const controller = {
   index: async (req: Request, res: Response) => {
     const filter: any = {
       deleted: false,
-      $or: [{ createdBy: req.user.id }, { listUsers: req.user.id }],
+      $or: [{ createdBy: req.user._id }, { listUsers: req.user._id }],
     };
     // Filter by status
     if (req.query.status) {
@@ -170,7 +170,7 @@ export const controller = {
   // [POST] /api/v1/tasks/create
   create: async (req: Request, res: Response) => {
     try {
-      req.body.createdBy = req.user.id;
+      req.body.createdBy = req.user._id;
       const newTask = new Task(req.body);
       await newTask.save();
       res.status(201).json({
