@@ -10,9 +10,9 @@ export interface IProgress {
   completionRate?: number;
   createdBy?: {
     fullName: string;
-    role: string;
-    phone: string;
-    email: string;
+    role?: string;
+    phone?: string;
+    email?: string;
   };
 }
 
@@ -53,7 +53,11 @@ export const getProgress = async (
 
     for (const element of Object.values(stats)) {
       const total =
-        element.initial + element.doing + element.finish + element.pending;
+        element.initial +
+        element.doing +
+        element.finish +
+        element.pending +
+        element.notFinish;
       element.completionRate = total > 0 ? (element.finish / total) * 100 : 0;
     }
   }

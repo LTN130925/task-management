@@ -7,8 +7,9 @@ export const systemProgress = async () => {
   const finish = await getValueSystem.totalTaskFinish();
   const pending = await getValueSystem.totalTaskPending();
   const notFinish = await getValueSystem.totalTaskNotFinish();
-  const completionRate = (finish / initial + finish + pending + doing) * 100;
-  
+  const completionRate =
+    (finish / (initial + finish + pending + doing + notFinish)) * 100;
+
   return {
     total,
     initial,

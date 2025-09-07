@@ -4,12 +4,14 @@ import { Request, Response } from 'express';
 import User from '../../../../models/users.model';
 import Account from '../../../../models/accounts.model';
 import Task from '../../../../models/tasks.model';
+import Project from '../../../../models/projects.model';
 
 // services
 import { getProgress } from '../services/getProgress';
 import { makeNameUserInfo } from '../services/setNameProgress';
 import { getDeadline } from '../services/getDeadline';
 import { systemProgress } from '../services/systemProgress';
+import { projectsProgress } from '../services/getProgressProjects';
 
 // helpers
 import { pagination } from '../../../../helpers/pagination';
@@ -67,10 +69,8 @@ export const controller = {
 
       // Filter by keyword
       if (keyword) {
-        condition.$or = [
-          { title: new RegExp(keyword, 'i') },
-          { content: new RegExp(keyword, 'i') },
-        ];
+        const regex = new RegExp(keyword, 'i');
+        condition.$or = [{ title: regex }, { content: regex }];
       }
 
       // Sort by ...
@@ -98,14 +98,75 @@ export const controller = {
       // Deadline
       const deadline = await getDeadline();
 
-      return res.status(200).json({
+      res.status(200).json({
         success: true,
         data: progress,
         pagination: helperPagination,
         deadline,
       });
     } catch (error) {
-      return res.status(500).json({
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [GET] /api/v1/admin/dashboard/projects-progress
+  projectsProgress: async (req: Request, res: Response) => {
+    try {
+      const { status, userId, from, to, keyword }: any = req.query;
+
+      const condition: any = {
+        deleted: false,
+      };
+
+      // Filter by status, user, deadline
+      if (status || userId || (from && to)) {
+        condition.$or = [
+          { status: status },
+          { createdBy: userId },
+          { timeFinish: { $gte: from, $lte: to } },
+        ];
+      }
+
+      // Filter by keyword
+      if (keyword) {
+        const regex = new RegExp(keyword, 'i');
+        condition.$or = [{ title: regex }, { content: regex }];
+      }
+
+      // Sort by ...
+      const sort: any = {
+        title: 'desc',
+      };
+      if (req.query.sort_key && req.query.sort_value) {
+        sort[req.query.sort_key as string] = req.query.sort_value as string;
+      }
+
+      const totalTasks = await Project.countDocuments(condition);
+      const helperPagination = pagination(
+        {
+          page: 1,
+          limit: 4,
+        },
+        totalTasks,
+        req.query
+      );
+
+      const progress = await projectsProgress(
+        condition,
+        sort,
+        helperPagination
+      );
+
+      res.status(200).json({
+        success: true,
+        data: progress,
+        pagination: helperPagination,
+      });
+    } catch (err) {
+      res.status(500).json({
         success: false,
         message: 'Lỗi server',
       });

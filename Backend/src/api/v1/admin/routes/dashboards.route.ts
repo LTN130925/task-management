@@ -11,6 +11,9 @@ router.get('/dropdowns', controller.dropdown);
 // [GET] /admin/api/v1/dashboard/progress
 router.get('/progress', controller.progress);
 
+// [GET] /admin/api/v1/dashboard/projects-progress
+router.get('/projects-progress', controller.projectsProgress);
+
 // [GET] /admin/api/v1/dashboard/system
 router.get('/system', controller.system);
 
