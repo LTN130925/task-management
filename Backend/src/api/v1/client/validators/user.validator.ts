@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
-import isValidPassword from '../../../../helpers/securePassword';
+import isValidPassword from '../../../../helpers/isPassword';
 
 export const userValidator = {
   register: (req: Request, res: Response, next: NextFunction) => {

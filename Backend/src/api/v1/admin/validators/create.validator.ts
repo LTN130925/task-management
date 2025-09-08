@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
 // helpers
-import isValidPassword from '../../../../helpers/securePassword';
+import isValidPassword from '../../../../helpers/isPassword';
 
 // edit and create validators
 export const createValidator = {
