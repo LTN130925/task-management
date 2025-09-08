@@ -17,15 +17,15 @@ export interface IProgress {
 }
 
 export const getProgress = async (
-  condition?: any,
-  sort?: any,
-  pagination?: any
+  condition: any = {},
+  sort: any = { createdAt: -1 },
+  pagination: any = { skip: 0, limit: 100 }
 ): Promise<IProgress[]> => {
-  const tasks = await Task.find(condition || { deleted: false })
+  const tasks = await Task.find({ deleted: false, ...condition })
     .lean()
-    .sort(sort || { createdAt: -1 })
-    .skip(pagination.skip || 0)
-    .limit(pagination.limit || 0);
+    .sort(sort)
+    .skip(pagination.skip)
+    .limit(pagination.limit);
   const stats: Record<string, IProgress> = {};
 
   for (const task of tasks) {

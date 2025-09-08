@@ -115,25 +115,24 @@ export const controller = {
   // [GET] /api/v1/admin/dashboard/projects-progress
   projectsProgress: async (req: Request, res: Response) => {
     try {
-      const { status, userId, from, to, keyword }: any = req.query;
+      const { status, from, to, keyword }: any = req.query;
 
       const condition: any = {
         deleted: false,
       };
 
       // Filter by status, user, deadline
-      if (status || userId || (from && to)) {
+      if (status || (from && to)) {
         condition.$or = [
           { status: status },
-          { createdBy: userId },
-          { timeFinish: { $gte: from, $lte: to } },
+          { deadline: { $gte: from, $lte: to } },
         ];
       }
 
       // Filter by keyword
       if (keyword) {
         const regex = new RegExp(keyword, 'i');
-        condition.$or = [{ title: regex }, { content: regex }];
+        condition.$or = [{ title: regex }, { description: regex }];
       }
 
       // Sort by ...
