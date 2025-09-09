@@ -22,6 +22,8 @@ import { cleanUpdatedByJobAccount } from './cron/cleanUpdatedBy';
 import { cleanUpdatedByJobRole } from './cron/cleanUpdatedBy';
 import { cleanUpdatedByJobUser } from './cron/cleanUpdatedBy';
 import { cleanUpdatedByJobProject } from './cron/cleanUpdatedBy';
+import { reportDataTasks } from './cron/report';
+import { reportDataProject } from './cron/report';
 
 // Initialize Express
 const app: Application = express();
@@ -41,6 +43,8 @@ cleanUpdatedByJobAccount();
 cleanUpdatedByJobRole();
 cleanUpdatedByJobUser();
 cleanUpdatedByJobProject();
+reportDataTasks();
+reportDataProject();
 
 // Routes
 // => v1

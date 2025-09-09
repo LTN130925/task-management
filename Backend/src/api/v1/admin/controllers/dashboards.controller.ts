@@ -12,6 +12,8 @@ import { makeNameUserInfo } from '../services/setNameProgress';
 import { getDeadline } from '../services/getDeadline';
 import { systemProgress } from '../services/systemProgress';
 import { projectsProgress } from '../services/getProgressProjects';
+import { chartTask } from '../services/getChartTasks';
+import { getChartProjects } from '../services/getChartProjects';
 
 // helpers
 import { pagination } from '../../../../helpers/pagination';
@@ -166,6 +168,24 @@ export const controller = {
       });
     } catch (err) {
       res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [GET] /api/v1/admin/dashboard/chart
+  chart: async (req: Request, res: Response) => {
+    try {
+      const chart = await chartTask();
+      const chartProject = await getChartProjects();
+      return res.status(200).json({
+        success: true,
+        chartTask: chart,
+        chartProject,
+      });
+    } catch (error) {
+      return res.status(500).json({
         success: false,
         message: 'Lỗi server',
       });

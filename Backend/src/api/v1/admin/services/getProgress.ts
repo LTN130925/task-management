@@ -43,6 +43,8 @@ export const getProgress = async (
 
     (stats[userId] as any)[task.status] += 1;
 
+    if (task.status === 'notFinish') continue;
+
     if (
       task.status !== 'finish' &&
       task.timeFinish &&
@@ -50,16 +52,16 @@ export const getProgress = async (
     ) {
       stats[userId].notFinish += 1;
     }
+  }
 
-    for (const element of Object.values(stats)) {
-      const total =
-        element.initial +
-        element.doing +
-        element.finish +
-        element.pending +
-        element.notFinish;
-      element.completionRate = total > 0 ? (element.finish / total) * 100 : 0;
-    }
+  for (const element of Object.values(stats)) {
+    const total =
+      element.initial +
+      element.doing +
+      element.finish +
+      element.pending +
+      element.notFinish;
+    element.completionRate = total > 0 ? (element.finish / total) * 100 : 0;
   }
 
   return Object.values(stats);

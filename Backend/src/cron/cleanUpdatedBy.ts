@@ -5,6 +5,9 @@ import Project from '../models/projects.model';
 
 import cron from 'node-cron';
 
+// helper
+import sendMail from '../helpers/sendMail';
+
 export const cleanUpdatedByJobAccount = () => {
   cron.schedule('0 2 * * *', async () => {
     const oneMonthAgo = new Date();

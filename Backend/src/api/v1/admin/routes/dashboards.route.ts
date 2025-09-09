@@ -14,6 +14,9 @@ router.get('/progress', controller.progress);
 // [GET] /admin/api/v1/dashboard/projects-progress
 router.get('/projects-progress', controller.projectsProgress);
 
+// [GET] /admin/api/v1/dashboard/chart
+router.get('/chart', controller.chart);
+
 // [GET] /admin/api/v1/dashboard/system
 router.get('/system', controller.system);
 
