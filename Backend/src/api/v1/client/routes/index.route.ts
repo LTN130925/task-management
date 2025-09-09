@@ -17,4 +17,4 @@ export default (app: Application) => {
   app.use(`${version}/projects`, Auth.requireAuth, projectRoutes);
 
   app.use(`${version}/user`, userRoutes);
-}
+};

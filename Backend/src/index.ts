@@ -36,7 +36,37 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 
 // cors
-app.use(cors());
+// Cấu hình CORS chi tiết
+// Danh sách origin được phép gọi API
+const allowedOrigins = [
+  'http://localhost:3000',        // local dev
+  'https://staging.example.com',  // staging
+  'https://example.com',          // production
+];
+
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // Cho phép request từ Postman / server nội bộ (origin có thể undefined)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // Cho phép cookie / Authorization header
+};
+
+app.use(cors(corsOptions));
+
+// Thêm middleware options ở đây
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    return res.status(200).json({});
+  }
+  next();
+});
 
 // cron
 cleanUpdatedByJobAccount();
