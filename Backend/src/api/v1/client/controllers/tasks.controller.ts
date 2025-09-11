@@ -2,12 +2,34 @@ import { Request, Response } from 'express';
 
 // models
 import Task from '../../../../models/tasks.model';
+import User from '../../../../models/users.model';
+import Account from '../../../../models/accounts.model';
 
 // helper
 import { pagination } from '../../../../helpers/pagination';
 import { getSubTask } from '../../../../helpers/subTasks';
 
 export const controller = {
+  // [GET] /api/v1/dropdowns/users
+  dropdowns: async (req: Request, res: Response) => {
+    // create or edit insert listUser tasks
+    const users = await User.find({ deleted: false })
+      .lean()
+      .select('_id fullName');
+
+    const accounts = await Account.find({ deleted: false })
+      .lean()
+      .select('_id fullName');
+
+    res.status(200).json({
+      success: true,
+      data: {
+        users,
+        accounts,
+      },
+    });
+  },
+
   // [GET] /api/v1/tasks
   index: async (req: Request, res: Response) => {
     const filter: any = {
@@ -81,6 +103,47 @@ export const controller = {
       });
     } catch (error) {
       return res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [GET] /api/v1/tasks/detail/:id/list-user
+  listUsers: async (req: Request, res: Response) => {
+    try {
+      const task: any = await Task.findOne({
+        _id: req.params.id,
+        deleted: false,
+      })
+        .lean()
+        .select('listUsers');
+
+      if (task?.listUsers.length > 0) {
+        const accounts = await Account.find({
+          _id: { $in: task.listUsers },
+          deleted: false,
+        })
+          .lean()
+          .select('fullName');
+
+        const users = await User.find({
+          _id: { $in: task.listUsers },
+          deleted: false,
+        })
+          .lean()
+          .select('fullName');
+
+        res.status(200).json({
+          success: true,
+          data: {
+            admin: accounts,
+            user: users,
+          },
+        });
+      }
+    } catch (err) {
+      res.status(500).json({
         success: false,
         message: 'Lỗi server',
       });

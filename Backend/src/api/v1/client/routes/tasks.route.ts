@@ -12,11 +12,17 @@ import { deleteValidator } from '../validators/delete.validator';
 
 const router = Router();
 
+// [GET] /api/v1/dropdowns/users
+router.get('/dropdowns/users', controller.dropdowns);
+
 // [GET] /api/v1/tasks
 router.get('/', controller.index);
 
 // [GET] /api/v1/tasks/detail/:id
 router.get('/detail/:id', detailValidator.detail, controller.detail);
+
+// [GET] /api/v1/tasks/detail/:id/list-user
+router.get('/detail/:id/list-user', detailValidator.detail, controller.listUsers);
 
 // [GET] /api/v1/tasks/detail/:id/subtasks
 router.get('/detail/:id/subtasks', detailValidator.detail, controller.subtasks);

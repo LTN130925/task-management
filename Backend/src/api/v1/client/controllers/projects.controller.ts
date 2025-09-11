@@ -3,12 +3,14 @@ import { Request, Response } from 'express';
 // models
 import Project from '../../../../models/projects.model';
 import Account from '../../../../models/accounts.model';
+import User from '../../../../models/users.model';
+import Task from '../../../../models/tasks.model';
 
 // helper
 import { pagination } from '../../../../helpers/pagination';
 
 export const controller = {
-  // [GET] /api/v1/tasks
+  // [GET] /api/v1/projects
   index: async (req: Request, res: Response) => {
     const filter: any = {
       deleted: false,
@@ -82,7 +84,7 @@ export const controller = {
     });
   },
 
-  // [GET] /api/v1/tasks/detail/:id
+  // [GET] /api/v1/projects/detail/:id
   detail: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -122,4 +124,67 @@ export const controller = {
       });
     }
   },
+
+  // [GET] /api/v1/projects/detail/:id/list-member
+  listMember: async (req: Request, res: Response) => {
+    try {
+      const project: any = await Project.findOne({
+        _id: req.params.id,
+        deleted: false,
+      })
+        .lean()
+        .select('members');
+
+      if (project?.members.length > 0) {
+        const accounts = await Account.find({
+          _id: { $in: project.members },
+          deleted: false,
+        })
+          .lean()
+          .select('fullName');
+
+        const users = await User.find({
+          _id: { $in: project.members },
+          deleted: false,
+        })
+          .lean()
+          .select('fullName');
+
+        res.status(200).json({
+          success: true,
+          data: {
+            admin: accounts,
+            user: users,
+          },
+        });
+      }
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  },
+
+  // [GET] /api/v1/projects/detail/:id/list-tasks
+  listTasks: async (req: Request, res: Response) => {
+    try {
+      const tasks: any = await Task.find({
+        projectId: req.params.id,
+        deleted: false,
+      })
+        .lean()
+        .select('title status');
+
+      res.status(200).json({
+        success: true,
+        data: tasks,
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server',
+      });
+    }
+  }
 };
