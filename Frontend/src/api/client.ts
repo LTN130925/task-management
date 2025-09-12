@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getAccessToken, getRefreshToken, setAuth, clearAuth } from '../store/auth';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
+  baseURL: import.meta.env.VITE_API_BASE_URL as string,
   withCredentials: false,
 });
 
@@ -53,7 +53,7 @@ api.interceptors.response.use(
         const refreshToken = getRefreshToken();
         if (!refreshToken) throw new Error('No refresh token');
         const resp = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/v1/user/refresh-token`,
+          `${import.meta.env.VITE_API_BASE_URL as string}/api/v1/user/refresh-token`,
           { refreshToken }
         );
         const newAccess = resp.data?.accessToken as string;
